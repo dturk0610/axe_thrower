@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+
+    precision mediump float;
+    attribute vec4 vertexPosition;
+    attribute vec3 nv;
+    
+    // Uniforms for modelview, modelview inverse transpose
+    // and projections
+    uniform mat4 M, M_inverseTranspose, P_orth, P_persp;
+    
+    // Uniform to decide if orthographic is on
+    // or not (in which case perspective is on)
+    uniform float orthIsOn;
+    
+    // Uniform for light position for light source
+    // (only one light source used here).
+    uniform vec3 p0;
+    
+    // Uniforms for ambient, diffuse, and specular
+    // components of light for light source
+    uniform vec3 Ia, Id, Is;
+
+    // Varying vectors for attenuateed components of light,
+    // and for incident ray (i), viewing ray (view), and normal (n)
+    varying vec3 Ia_pp0, Id_pp0, Is_pp0;
+    varying vec3 i, view, n;
+    
+    void main() {
+        gl_PointSize = 1.0;
+        
+        // Transform your vertices by the modelview matrix
+        vec4 vertexPositionTransformed = M * vertexPosition;
+
+        vec4 nv4 = vec4( nv.x, nv.y, nv.z, 1.0 );
+        vec4 nv4transformed = M_inverseTranspose * nv4;
+        vec3 nvtransformed = normalize( nv4transformed.xyz );
+
+        // Get reflection for light source
+        float distance = length( p0 - vertexPositionTransformed.xyz );
+
+        // since the distance is fairly large, the distance^2 is even larger,
+        // so it is better to use the form a * distance^2 + b * distance + c
+        // with small values (a = .00005, b = 0, c = 0) for the constants.
+
+        float a = 0.00005, b = 0.0, c = 0.0;
+        float scalefactor = a * distance * distance + b * distance + c;
+        Ia_pp0 = Ia / scalefactor;
+        Id_pp0 = Id / scalefactor;
+        Is_pp0 = Is / scalefactor;
+
+        // Set up i, view, and n
+        i = normalize( p0 - vertexPositionTransformed.xyz );
+        view = normalize( vec3( 0.0, 0.0, 0.0 ) - vertexPositionTransformed.xyz );
+        n = nvtransformed;
+        
+        if (orthIsOn > 0.5) {
+            gl_Position = P_orth * vertexPositionTransformed;
+        } else {
+            gl_Position = P_persp * vertexPositionTransformed;
+        }
+    }
+
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+
+    precision mediump float;
+    
+    // Uniforms for ambient, diffuse, and specular
+    // coefficients
+    uniform vec3 ka, kd, ks;
+    
+    // Uniform for shininess
+    uniform float alpha;
+    
+    // Varying vectors for attenuated components of light,
+    // and for incident ray (i), viewing ray (view), and normal (n)    
+    varying vec3 Ia_pp0, Id_pp0, Is_pp0;
+    varying vec3 i, view, n;
+    
+    void main() {
+        vec3 Ra, Rd, Rs;
+        vec3 view_renorm, i_renorm, n_renorm;
+        
+        // The varying vectors have been interpolated from the
+        // vertex shader, but during interpolation, the values
+        // at the fragments lose the normalization. So they need
+        // to be re-normalized
+        view_renorm = normalize( view );    
+        i_renorm = normalize( i );    
+        n_renorm = normalize( n );
+
+        // Ambient reflection
+        Ra.r = ka.r * Ia_pp0.r;
+        Ra.g = ka.g * Ia_pp0.g;
+        Ra.b = ka.b * Ia_pp0.b;
+        
+        // Diffuse reflection
+        // costheta1 will contain dot product between incident
+        // direction and transformed normal
+        float costheta = dot( i_renorm, n_renorm );
+        Rd.r = kd.r * Id_pp0.r * max( costheta, 0.0 );
+        Rd.g = kd.g * Id_pp0.g * max( costheta, 0.0 );
+        Rd.b = kd.b * Id_pp0.b * max( costheta, 0.0 );
+        
+        // Specular reflection
+        vec3 r = 2.0*costheta*n_renorm - i_renorm;
+
+        float cosphi = dot( r, view_renorm );
+        float shine = pow( max( cosphi, 0.0 ), alpha );
+        float account;
+        if (costheta > 0.0){
+            account = 1.0;
+        } else{
+            account = 0.0;
+        }
+
+        Rs.r = ks.r * Is_pp0.r * shine * account;
+        Rs.g = ks.g * Is_pp0.g * shine * account;
+        Rs.b = ks.b * Is_pp0.b * shine * account; 
+        
+        // Add all the ambient, diffuse, and specular reflections from all the light sources together
+        vec3 R = clamp( Ra + Rd + Rs, 0.0, 1.0 );
+
+        gl_FragColor = vec4( R.r, R.g, R.b, 1.0 );
+    }
+
+</script>
+
+<script type="text/javascript" src="../Common/webgl-utils.js"></script>
+<script type="text/javascript" src="../Common/initShaders.js"></script>
+<script type="text/javascript" src="../Common/MV.js"></script>
+<script type="text/javascript" src="teapotSetup.js"></script>
+<script type="text/javascript" src="teapotObject.js"></script>
+<script type="text/javascript" src="scene.js"></script>
+<script type="text/javascript" src="camera.js"></script>
+</head>
+
+<body onload = "initGL()">
+    <canvas id="gl-canvas" height="900" width="1600">
+    </canvas>
+    <button id="orthButton" onclick="showOrthographic()">Orthographic</button>
+    <button id="perspButton" onclick="showPerspective()">Perspective</button>
+</body>
+</html>
