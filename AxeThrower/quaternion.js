@@ -20,12 +20,28 @@ class Quat{
      * @param {number} angle angle in degress to rotate around by
      */
     setWithAxisAndAngle( axis, angle ){
-        angle = angle * Math.PI / 180.0;
         axis = normalize(axis); // makes sure that the axis is truly normalized
+        angle = angle * Math.PI / 180.0;
         this.x = axis[0] * Math.sin( angle/2 );
         this.y = axis[1] * Math.sin( angle/2 );
         this.z = axis[2] * Math.sin( angle/2 );
         this.w = Math.cos( angle/2 );
+    }
+
+    /**
+     * 
+     * @param {vec3} axis axis to rotate around
+     * @param {number} angle angle in degress to rotate around by
+     * @returns new Quat built from rotation axis and angle
+     */
+    static fromAxisAndAngle( axis, angle ){
+        axis = normalize(axis); // makes sure that the axis is truly normalized
+        angle = angle * Math.PI / 180.0;
+        var x = axis[0] * Math.sin( angle/2 );
+        var y = axis[1] * Math.sin( angle/2 );
+        var z = axis[2] * Math.sin( angle/2 );
+        var w = Math.cos( angle/2 );
+        return new Quat( x, y, z, w );
     }
 
     /**
@@ -45,6 +61,6 @@ class Quat{
             [  q.y, -q.x,  q.w, -q.z ],
             [  q.x,  q.y,  q.z,  q.w ]
         );
-        return mult( mat1, mat2 );
+        return transpose( mult( mat1, mat2 ) );
     }
 }

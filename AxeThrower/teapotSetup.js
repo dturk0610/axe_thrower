@@ -32,6 +32,8 @@ var myShaderProgram;
 var h, w, invh, invw;
 var myScene;
 
+var floorShader;
+
 function initGL(){
     var canvas = document.getElementById( "gl-canvas" );
     
@@ -47,16 +49,16 @@ function initGL(){
 
     gl.useProgram( myShaderProgram );
 
-    
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     numVertices = 531;
     numTriangles = 1062;
+
     vertices = getVertices(); // vertices and faces are defined in teapot20.js
     indexList = getFaces();
     
     var indexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexList), gl.STATIC_DRAW);
-    
     var verticesBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, verticesBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
@@ -65,14 +67,14 @@ function initGL(){
     gl.vertexAttribPointer( vertexPosition, 4, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vertexPosition );
     
-
+    
     // Insert your code here
     
     // Compute vertex normals. You first need to get the normals for each face.
     var faceNormals=getFaceNormals( vertices, indexList, numTriangles );
     // Then you need to get the normals for each vertex, given the normals for each face.
     var vertexNormals=getVertexNormals( vertices, indexList, faceNormals, numVertices, numTriangles );
-
+    
     // We have an attribute called 'nv' in the vertex shader. We need to provide
     // vertex normals for every vertex to 'nv'. For this, buffer the vertex normals
     // on the GPU, and set up an attribute pointer to iterate over the buffer.
@@ -105,15 +107,15 @@ function initGL(){
     var negVDotE = -dot( v, e );
     var negNDotE = -dot( n, e );
     var modelViewMatrix = [     u[0],     v[0],     n[0], 0.0,
-                                u[1],     v[1],     n[1], 0.0,
-                                u[2],     v[2],     n[2], 0.0,
-                            negUDotE, negVDotE, negNDotE, 1.0 ];
-
+    u[1],     v[1],     n[1], 0.0,
+    u[2],     v[2],     n[2], 0.0,
+    negUDotE, negVDotE, negNDotE, 1.0 ];
+    
     // Modelview inverse transpose
     var modelViewMatrixInverseTranspose = [ u[0], v[0], n[0], e[0],
-                                            u[1], v[1], n[1], e[1],
-                                            u[2], v[2], n[2], e[2],
-                                             0.0,  0.0,  0.0,  1.0 ];
+    u[1], v[1], n[1], e[1],
+    u[2], v[2], n[2], e[2],
+    0.0,  0.0,  0.0,  1.0 ];
     
     var modelViewMatrixLocation = gl.getUniformLocation( myShaderProgram, "M" );
     gl.uniformMatrix4fv( modelViewMatrixLocation, false, modelViewMatrix );
@@ -128,26 +130,28 @@ function initGL(){
     var bottom = -30.0;
     var near = 50.0;
     var far = 100.0;
-
+    
     var orthographicProjectionMatrix = [ 2.0/(right - left),                          0.0,                     0.0, 0.0,
-                                                        0.0,          2.0/(top_ - bottom),                     0.0, 0.0,
-                                                        0.0,                          0.0,       -2.0/(far - near), 0.0, 
-                                 -(left+right)/(right-left), -(top_+bottom)/(top_-bottom), -(far+near)/(far-near), 1.0 ];
-
+    0.0,          2.0/(top_ - bottom),                     0.0, 0.0,
+    0.0,                          0.0,       -2.0/(far - near), 0.0, 
+    -(left+right)/(right-left), -(top_+bottom)/(top_-bottom), -(far+near)/(far-near), 1.0 ];
+    
     var perspectiveProjectionMatrix = [     2.0*near/(right-left),                         0.0,                        0.0,  0.0,
-                                                              0.0,      2.0*near/(top_-bottom),                        0.0,  0.0,
-                                        (right+left)/(right-left), (top_+bottom)/(top_-bottom),     -(far+near)/(far-near), -1.0,
-                                                              0.0,                         0.0,   -2.0*far*near/(far-near),  0.0 ];
+    0.0,      2.0*near/(top_-bottom),                        0.0,  0.0,
+    (right+left)/(right-left), (top_+bottom)/(top_-bottom),     -(far+near)/(far-near), -1.0,
+    0.0,                         0.0,   -2.0*far*near/(far-near),  0.0 ];
     
     var orthographicProjectionMatricLocation = gl.getUniformLocation( myShaderProgram, "P_orth" );
     gl.uniformMatrix4fv( orthographicProjectionMatricLocation, false, orthographicProjectionMatrix );
-
+    
     var perspectiveProjectionMatricLocation = gl.getUniformLocation( myShaderProgram, "P_persp" );
     gl.uniformMatrix4fv( perspectiveProjectionMatricLocation, false, perspectiveProjectionMatrix );
     
     orthographicIsOn = 1.0;
     orthographicIsOnLocation = gl.getUniformLocation( myShaderProgram, "orthIsOn" );
     gl.uniform1f( orthographicIsOnLocation, orthographicIsOn );
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     var kaloc = gl.getUniformLocation( myShaderProgram, "ka" );
     var kdloc = gl.getUniformLocation( myShaderProgram, "kd" );
@@ -171,7 +175,9 @@ function initGL(){
     gl.uniform3f( Isloc, 0.8, 0.8, 0.8 );
 
     // render the object
-    drawObject();
+    //drawObject();
+
+    drawScene();
 
 };
 
@@ -181,13 +187,125 @@ function setupGL(){
     gl.clearColor( 0.0, 0.0, 0.0, 1.0 );
     
     myShaderProgram = initShaders( gl, "vertex-shader", "fragment-shader" );
+    floorShader =  initShaders( gl, "vertex-shader", "fragment-shader" );
 }
 
 
 function setupScene(){
-    var cam = new Camera( vec3(0, 0, 0), new Quat( 0, 0, 0, 1 ), w/h, .01, 1000, 60 );
+    var cam = new Camera( vec3(0, 1, 0), new Quat( 0, 0, 0, 1 ), w/h, .01, 1000, 60 );
     myScene = new Scene( cam );
+
+    var floor = new Quad( 50, 50, vec4( 0, 0, 0, 1), Quat.fromAxisAndAngle( vec3( 0, 1, 0 ), 0 ));
+    floor.program = floorShader;
+    myScene.addObject( floor );
+
+    var wall1 = new Quad( 50, 50, vec4( -50, 0, 0, 1), Quat.fromAxisAndAngle( vec3( 1, 0, 0 ), 0 ));
+    wall1.program = floorShader;
+    myScene.addObject( wall1 );
+    var wall2 = new Quad( 50, 50, vec4( 50, 0, 0, 1), Quat.fromAxisAndAngle( vec3( -1, 0, 0 ), 0 ));
+    wall2.program = floorShader;
+    myScene.addObject( wall2 );
+    var wall3 = new Quad( 50, 50, vec4( 0, 0, -50, 1), Quat.fromAxisAndAngle( vec3( 0, 0, 1 ), 0 ));
+    wall3.program = floorShader;
+    myScene.addObject( wall3 );
+    var wall4 = new Quad( 50, 50, vec4( 0, 0, 50, 1), Quat.fromAxisAndAngle( vec3( 0, 0, -1 ), 0 ));
+    wall4.program = floorShader;
+    myScene.addObject( wall4 );
+
+
+
+}
+
+
+function drawScene(){
+    myScene.objects.forEach( obj => {
+        var currProgram = obj.program;
+        gl.useProgram( currProgram );
+
+        var numVerts = obj.verts.length;
+        var numTriangles = obj.indices.length/3;
+
+        var verts = obj.getVertices();
+        //console.log(verts);
+        var indexList = obj.getFaces();
+
+        var indexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexList), gl.STATIC_DRAW);
+
+        var verticesBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, verticesBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(verts), gl.STATIC_DRAW);
+
+        var vertexPosition = gl.getAttribLocation(currProgram, "vertexPosition");
+        gl.vertexAttribPointer( vertexPosition, 4, gl.FLOAT, false, 0, 0 );
+        gl.enableVertexAttribArray( vertexPosition );
+
     
+        // Compute vertex normals. You first need to get the normals for each face.
+        var faceNormals = getFaceNormals( verts, indexList, numTriangles );
+        // Then you need to get the normals for each vertex, given the normals for each face.
+        var vertexNormals = getVertexNormals( verts, indexList, faceNormals, numVerts, numTriangles );
+
+        // Create the buffer for the normals
+        var normalsbuffer = gl.createBuffer();
+        // bind the buffer to the ARRAY_BUFFER target for WebGL to see it
+        gl.bindBuffer( gl.ARRAY_BUFFER,normalsbuffer );
+        // send the data to the GPU.
+        gl.bufferData( gl.ARRAY_BUFFER, flatten( vertexNormals ), gl.STATIC_DRAW );
+
+        var vertexNormalPointer = gl.getAttribLocation( currProgram, "nv" );
+        // Set up the vertex normal pointer to iterate over every 3 adjacent
+        // values (x, y, and z coordinates of normal)
+        gl.vertexAttribPointer( vertexNormalPointer, 3, gl.FLOAT, false, 0, 0 );
+        // Active the vertex normal pointer to iterate over the array
+        gl.enableVertexAttribArray( vertexNormalPointer );
+
+
+        var modelViewMatrixLocation = gl.getUniformLocation( currProgram, "M" );
+        gl.uniformMatrix4fv( modelViewMatrixLocation, false, flatten(myScene.camera.viewMat ) );
+        var modelViewMatrixInverseTransposeLocation = gl.getUniformLocation( currProgram, "M_inverseTranspose" );
+        gl.uniformMatrix4fv( modelViewMatrixInverseTransposeLocation, false, flatten(transpose( inverse( myScene.camera.viewMat ) ) ) );
+
+
+        var perspectiveProjectionMatricLocation = gl.getUniformLocation( currProgram, "P_persp" );
+        gl.uniformMatrix4fv( perspectiveProjectionMatricLocation, false, flatten( myScene.camera.viewProjectMatrix) );
+        console.log( mult( myScene.camera.viewProjectMatrix, verts ) );
+        orthographicIsOn = 0;
+        orthographicIsOnLocation = gl.getUniformLocation( currProgram, "orthIsOn" );
+        gl.uniform1f( orthographicIsOnLocation, orthographicIsOn );
+
+
+        var kaloc = gl.getUniformLocation( currProgram, "ka" );
+        var kdloc = gl.getUniformLocation( currProgram, "kd" );
+        var ksloc = gl.getUniformLocation( currProgram, "ks" );
+        gl.uniform3f( kaloc, 0.5, 0.5, 0.5 );
+        gl.uniform3f( kdloc, 0.5, 0.5, 0.5 );
+        gl.uniform3f( ksloc, 1.0, 1.0, 1.0 );
+
+        var alphaloc = gl.getUniformLocation( currProgram, "alpha" );
+        gl.uniform1f( alphaloc, 4.0 );
+
+        var p0loc = gl.getUniformLocation( currProgram, "p0" );
+        gl.uniform3f( p0loc, 0.0, 0.0, 45.0 );
+
+
+        var Ialoc = gl.getUniformLocation( currProgram, "Ia" );
+        var Idloc = gl.getUniformLocation( currProgram, "Id" );
+        var Isloc = gl.getUniformLocation( currProgram, "Is" );
+        gl.uniform3f( Ialoc, 0.1, 0.1, 0.1 );
+        gl.uniform3f( Idloc, 0.8, 0.8, 0.5 );
+        gl.uniform3f( Isloc, 0.8, 0.8, 0.8 );
+
+
+        gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
+        gl.drawElements( gl.TRIANGLES, 3 * numTriangles, gl.UNSIGNED_SHORT, 0 )
+        //requestAnimFrame(drawObject); // remember to have this in so that you
+        //                            // can render interactions with buttons
+        console.log("yup");
+    });
+
+    //requestAnimationFrame(drawScene);
 }
 
 
@@ -264,5 +382,3 @@ function drawObject() {
     requestAnimFrame(drawObject); // remember to have this in so that you
                                 // can render interactions with buttons
 }
-
-
