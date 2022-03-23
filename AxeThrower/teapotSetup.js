@@ -192,7 +192,7 @@ function setupGL(){
 
 
 function setupScene(){
-    var cam = new Camera( vec3(0, 1, 0), new Quat( 0, 0, 0, 1 ), w/h, .01, 1000, 60 );
+    var cam = new Camera( vec3( 0, 1.6, -1 ), new Quat( 0, 0, 0, 1 ), w/h, .01, 1000, 60 );
     myScene = new Scene( cam );
 
     var floor = new Quad( 50, 50, vec4( 0, 0, 0, 1), Quat.fromAxisAndAngle( vec3( 0, 1, 0 ), 0 ));
