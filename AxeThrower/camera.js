@@ -30,19 +30,21 @@ class Camera{
                                                                // perspective matrix gets absorbed into this
         
         return mat4(
-            [ invf/this.aspect,    0,                                         0,                                         0 ],
-            [                0, invf,                                         0,                                         0 ],
-            [                0,    0, (this.farPlane + this.nearPlane)*invRange, 2.0*this.nearPlane*this.farPlane*invRange ],  // negatives absorbed into the invRange
-            [                0,    0,                                        -1,                                         0 ] );
+            [ invf/this.aspect,    0,                                         0,  0 ],
+            [                0, invf,                                         0,  0 ],
+            [                0,    0, (this.farPlane + this.nearPlane)*invRange, -1 ],  // negatives absorbed into the invRange
+            [                0,    0, 2.0*this.nearPlane*this.farPlane*invRange,  0 ] );// negatives absorbed into the invRange
     }
 
     calculateCameraMatrix = function(){
-        return mat4(
-            [ 1, 0, 0, this.position[0] ],
-            [ 0, 1, 0, this.position[1] ],
-            [ 0, 0, 1, this.position[2] ],
-            [ 0, 0, 0,                1 ] 
+        var rotMat = Quat.toMat4(this.rotation);
+        var translateMat = mat4(
+            [                1,                0,                0,                0 ],
+            [                0,                1,                0,                0 ],
+            [                0,                0,                1,                0 ],
+            [ this.position[0], this.position[1], this.position[2],                1 ] 
         );
+        return mult( rotMat, translateMat );
     }
 
     calculateViewMatrix = function(){
