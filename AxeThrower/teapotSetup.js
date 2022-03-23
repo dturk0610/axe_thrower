@@ -30,6 +30,7 @@ var myShaderProgram;
 
 
 var h, w, invh, invw;
+var myScene;
 
 function initGL(){
     var canvas = document.getElementById( "gl-canvas" );
@@ -41,6 +42,9 @@ function initGL(){
     w = parseFloat(canvas.width); invw = 1.0/w;
 
     setupGL();
+    setupScene();
+
+
     gl.useProgram( myShaderProgram );
 
     
@@ -178,6 +182,14 @@ function setupGL(){
     
     myShaderProgram = initShaders( gl, "vertex-shader", "fragment-shader" );
 }
+
+
+function setupScene(){
+    var cam = new Camera( vec3(0, 0, 0), new Quat( 0, 0, 0, 1 ), w/h, .01, 1000, 60 );
+    myScene = new Scene( cam );
+
+}
+
 
 // The following function takes in vertices, indexList, and numTriangles
 // and outputs the face normals

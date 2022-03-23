@@ -1,5 +1,5 @@
 
-function Scene(objects = [], camera){
+function Scene( camera, objects = [] ){
     this.objects = objects;
     this.camera = camera;
 
