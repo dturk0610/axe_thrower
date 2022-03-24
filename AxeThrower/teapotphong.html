@@ -9,9 +9,11 @@
     
     // Uniforms for modelview, modelview inverse transpose
     // and projections
-    uniform mat4 viewProjectMat;
+    uniform mat4 projectMat, camToWorldMat, viewProjectMat;
     uniform mat4 worldMat;
     void main() {
+        
+
         gl_Position = viewProjectMat * worldMat * vertexPosition;
     }
 </script>
