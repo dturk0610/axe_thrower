@@ -69,6 +69,7 @@ function setupGL(){
 
 
 function setupScene(){
+    
     var cam = new Camera( vec3( 0, 1, 0, 1 ), new Quat( 0, 0, 0, 1 ), w/h, .3, 4000, 60 );
     myScene = new Scene( cam );
 
@@ -96,8 +97,6 @@ function setupScene(){
     wall4.program = floorShader;
     wall4.color = vec4( 0.8, 0.2, 1, 1 );
     myScene.addObject( wall4 );
-
-
 
 }
 
