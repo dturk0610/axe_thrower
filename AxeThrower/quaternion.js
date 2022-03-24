@@ -88,4 +88,9 @@ class Quat{
 
         return q;
     }
+
+    static identity = new Quat( 0, 0, 0, 1 );
+    static isEqual( q1, q2 ){
+        return ( q1.x == q2.x && q1.y == q2.y && q1.z == q2.z && q1.w == q2.w );
+    }
 }

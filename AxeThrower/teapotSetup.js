@@ -43,6 +43,9 @@ function initGL(){
     h = parseFloat(canvas.height); invh = 1.0/h;
     w = parseFloat(canvas.width); invw = 1.0/w;
 
+    window.addEventListener("keydown", onKeyDown, false);
+    window.addEventListener("keyup", onKeyUp, false);
+
     setupGL();
     setupScene();
     drawScene();
@@ -143,7 +146,7 @@ function drawScene(){
         gl.drawElements( gl.TRIANGLES, 3 * numTriangles, gl.UNSIGNED_SHORT, 0 )
     });
 
-    //requestAnimationFrame(drawScene);
+    requestAnimationFrame(drawScene);
 }
 
 
@@ -195,48 +198,69 @@ function getVertexNormals( vertices, indexList, faceNormals, numVertices, numTri
 }
 
 
+var keyW = false, keyA = false, keyS = false, keyD = false;
+function onKeyDown(event) {
+    var keyCode = event.keyCode;
+    switch (keyCode) {
+        case 87: keyW = true; myScene.camera.moveForward(); drawScene(); break; // w
+        case 65: keyA = true; break; // a
+        case 83: keyS = true; break; // s
+        case 68: keyD = true; break; // d 
+    }
+}
+function onKeyUp(event) {
+    var keyCode = event.keyCode;
+    switch (keyCode) {
+        case 87: keyW = false; break; // w
+        case 65: keyA = false; break; // a
+        case 83: keyS = false; break; // s
+        case 68: keyD = false; break; // d
+    }
+}
+
+
 var yaw = 0, pitch = 0, roll = 0;
 function updateYaw( e ){
-    yaw = e.target.value;
-    myScene.camera.rotation = Quat.EulerToQuaternion( parseFloat(yaw) , parseFloat(pitch), parseFloat(roll) );
+    yaw = e.target.value * Math.PI/180.0;
+    myScene.camera.transform.rotation = Quat.EulerToQuaternion( parseFloat(yaw) , parseFloat(pitch), parseFloat(roll) );
     myScene.camera.update();
     drawScene();
 }
 
 function updatePitch( e ){
-    pitch = e.target.value;
-    myScene.camera.rotation = Quat.EulerToQuaternion( parseFloat(yaw), parseFloat(pitch) , parseFloat(roll) );
+    pitch = e.target.value * Math.PI/180.0;
+    myScene.camera.transform.rotation = Quat.EulerToQuaternion( parseFloat(yaw), parseFloat(pitch) , parseFloat(roll) );
     myScene.camera.update();
     drawScene();
 }
 
 function updateRoll( e ){
-    roll = e.target.value;
-    myScene.camera.rotation = Quat.EulerToQuaternion( parseFloat(yaw), parseFloat(pitch), parseFloat(roll) );
+    roll = e.target.value * Math.PI/180.0;
+    myScene.camera.transform.rotation = Quat.EulerToQuaternion( parseFloat(yaw), parseFloat(pitch), parseFloat(roll) );
     myScene.camera.update();
     drawScene();
 }
 
 function updateCamX( e ){
     var camX = e.target.value;
-    var currPos = myScene.camera.position;
-    myScene.camera.position = vec4( parseFloat(camX), currPos[1], currPos[2], 1 );
+    var currPos = myScene.camera.transform.position;
+    myScene.camera.transform.position = vec4( parseFloat(camX), currPos[1], currPos[2], 1 );
     myScene.camera.update();
     drawScene();
 }
 
 function updateCamY( e ){
     var camY = e.target.value;
-    var currPos = myScene.camera.position;
-    myScene.camera.position = vec4( currPos[0], parseFloat(camY), currPos[2], 1 );
+    var currPos = myScene.camera.transform.position;
+    myScene.camera.transform.position = vec4( currPos[0], parseFloat(camY), currPos[2], 1 );
     myScene.camera.update();
     drawScene();
 }
 
 function updateCamZ( e ){
     var camZ = e.target.value;
-    var currPos = myScene.camera.position;
-    myScene.camera.position = vec4( currPos[0], currPos[1], parseFloat(camZ), 1 );
+    var currPos = myScene.camera.transform.position;
+    myScene.camera.transform.position = vec4( currPos[0], currPos[1], parseFloat(camZ), 1 );
     myScene.camera.update();
     drawScene();
 }

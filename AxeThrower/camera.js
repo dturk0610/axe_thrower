@@ -9,8 +9,7 @@ class Camera{
      * @param {number} fov field of view in degrees
      */
     constructor( position = vec4( 0.0, 0.0, 10.0, 1.0 ), rotation = new Quat( 0.0, 0.0, 0.0, 1.0 ), aspect = 1, nearPlane = .01, farPlane = 1000.0, fov = 30 ){
-        this.position = position;
-        this.rotation = rotation;
+        this.transform = new Transform( position, rotation );
         this.aspect = aspect;
         this.nearPlane = nearPlane;
         this.farPlane = farPlane;
@@ -37,12 +36,12 @@ class Camera{
     }
 
     calculateCameraMatrix = function(){
-        var rotMat = Quat.toMat4(this.rotation);
+        var rotMat = Quat.toMat4(this.transform.rotation);
         var translateMat = [
-                           1,                0,                0, 0,
-                           0,                1,                0, 0,
-                           0,                0,                1, 0,
-            this.position[0], this.position[1], this.position[2], 1 
+                                     1,                          0,                          0, 0,
+                                     0,                          1,                          0, 0,
+                                     0,                          0,                          1, 0,
+            this.transform.position[0], this.transform.position[1], this.transform.position[2], 1 
         ];
         return Matrix.mult4x4( translateMat, rotMat );
     }
@@ -56,8 +55,17 @@ class Camera{
     } 
 
     update(){
-        this.projectionMat = this.constructPerspectiveMat();
         this.cameraToWorldMatrix = this.calculateCameraMatrix();
         this.viewMat = this.calculateViewMatrix();
+        this.transform.updateRotation();
+    }
+
+    moveForward(){
+        var moveAmount = .05;
+        var fwd = this.transform.fwdVec;
+        this.transform.position[0] -= fwd[0] * moveAmount;
+        this.transform.position[1] -= fwd[1] * moveAmount;
+        this.transform.position[2] -= fwd[2] * moveAmount;
+        this.update();
     }
 }
