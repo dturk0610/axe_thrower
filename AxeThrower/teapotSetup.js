@@ -46,6 +46,12 @@ function initGL(){
     window.addEventListener("keydown", onKeyDown, false);
     window.addEventListener("keyup", onKeyUp, false);
 
+    canvas.addEventListener("mousedown", function(e) { tryClick(canvas, e); }); 
+    canvas.addEventListener("mouseup", function(e) { endClick(canvas, e); }); 
+    canvas.addEventListener("mousemove", function(e) { mouseMove(canvas, e); });
+    canvas.addEventListener("mouseout", function(e) { endClick(canvas, e); });
+    
+
     setupGL();
     setupScene();
     drawScene();
@@ -147,6 +153,76 @@ function drawScene(){
     });
 }
 
+var mouseDown = false;
+var mouseDownPos = vec2(0, 0); 
+function tryClick( canvas, event ){
+    let rect = canvas.getBoundingClientRect();
+    let x = event.clientX - rect.left;
+    let y = rect.height - (event.clientY - rect.top);
+    mouseDownPos = vec2( x, y );
+    mouseDown = true;
+}
+
+// found a good way to handle this here:
+//https://gamedev.stackexchange.com/questions/30644/how-to-keep-my-quaternion-using-fps-camera-from-tilting-and-messing-up/30669#30669
+var turnAmount = .3;
+function mouseMove( canvas, event ){
+    if (mouseDown){
+        let rect = canvas.getBoundingClientRect();
+        let x = event.clientX - rect.left;
+        let y = rect.height - (event.clientY - rect.top);
+        var xDiff = parseFloat( x - mouseDownPos[0] );
+        var yDiff = parseFloat( y - mouseDownPos[1] );
+        //pitch +=  * turnAmount;
+        
+        var currRot = myScene.camera.transform.rotation;
+
+        if ( Math.abs(xDiff) > Math.abs(yDiff) ){
+            var yRotAmountMat = Quat.fromAxisAndAngle( vec3( 0, 1, 0 ), turnAmount*xDiff );
+            //console.log(Quat.mult( yRotAmountMat, currRot ));
+            currRot = Quat.mult( yRotAmountMat, currRot );
+        }else{
+            var xRotAmountMat = Quat.fromAxisAndAngle( vec3( 1, 0, 0 ), -turnAmount*yDiff );
+            currRot = Quat.mult( currRot, xRotAmountMat );
+        }
+        myScene.camera.transform.rotation = currRot;
+
+        myScene.camera.update();
+        mouseDownPos = vec2( x, y );
+        drawScene();
+    }
+}
+
+function endClick( canvas, event ){
+    if (mouseDown){
+        let rect = canvas.getBoundingClientRect();
+        let x = event.clientX - rect.left;
+        let y = rect.height - (event.clientY - rect.top);
+        mouseDown = false;
+    }
+}
+
+
+var keyW = false, keyA = false, keyS = false, keyD = false;
+function onKeyDown(event) {
+    var keyCode = event.keyCode;
+    switch (keyCode) {
+        case 87: keyW = true; myScene.camera.moveForward(); drawScene(); break; // w
+        case 65: keyA = true; break; // a
+        case 83: keyS = true; break; // s
+        case 68: keyD = true; break; // d 
+    }
+}
+function onKeyUp(event) {
+    var keyCode = event.keyCode;
+    switch (keyCode) {
+        case 87: keyW = false; break; // w
+        case 65: keyA = false; break; // a
+        case 83: keyS = false; break; // s
+        case 68: keyD = false; break; // d
+    }
+}
+
 
 // The following function takes in vertices, indexList, and numTriangles
 // and outputs the face normals
@@ -193,72 +269,4 @@ function getVertexNormals( vertices, indexList, faceNormals, numVertices, numTri
 
     // return the array of vertex normals
     return vertexNormals;
-}
-
-
-var keyW = false, keyA = false, keyS = false, keyD = false;
-function onKeyDown(event) {
-    var keyCode = event.keyCode;
-    switch (keyCode) {
-        case 87: keyW = true; myScene.camera.moveForward(); drawScene(); break; // w
-        case 65: keyA = true; break; // a
-        case 83: keyS = true; break; // s
-        case 68: keyD = true; break; // d 
-    }
-}
-function onKeyUp(event) {
-    var keyCode = event.keyCode;
-    switch (keyCode) {
-        case 87: keyW = false; break; // w
-        case 65: keyA = false; break; // a
-        case 83: keyS = false; break; // s
-        case 68: keyD = false; break; // d
-    }
-}
-
-
-var yaw = 0, pitch = 0, roll = 0;
-function updateYaw( e ){
-    yaw = e.target.value * Math.PI/180.0;
-    myScene.camera.transform.rotation = Quat.EulerToQuaternion( parseFloat(yaw) , parseFloat(pitch), parseFloat(roll) );
-    myScene.camera.update();
-    drawScene();
-}
-
-function updatePitch( e ){
-    pitch = e.target.value * Math.PI/180.0;
-    myScene.camera.transform.rotation = Quat.EulerToQuaternion( parseFloat(yaw), parseFloat(pitch) , parseFloat(roll) );
-    myScene.camera.update();
-    drawScene();
-}
-
-function updateRoll( e ){
-    roll = e.target.value * Math.PI/180.0;
-    myScene.camera.transform.rotation = Quat.EulerToQuaternion( parseFloat(yaw), parseFloat(pitch), parseFloat(roll) );
-    myScene.camera.update();
-    drawScene();
-}
-
-function updateCamX( e ){
-    var camX = e.target.value;
-    var currPos = myScene.camera.transform.position;
-    myScene.camera.transform.position = vec4( parseFloat(camX), currPos[1], currPos[2], 1 );
-    myScene.camera.update();
-    drawScene();
-}
-
-function updateCamY( e ){
-    var camY = e.target.value;
-    var currPos = myScene.camera.transform.position;
-    myScene.camera.transform.position = vec4( currPos[0], parseFloat(camY), currPos[2], 1 );
-    myScene.camera.update();
-    drawScene();
-}
-
-function updateCamZ( e ){
-    var camZ = e.target.value;
-    var currPos = myScene.camera.transform.position;
-    myScene.camera.transform.position = vec4( currPos[0], currPos[1], parseFloat(camZ), 1 );
-    myScene.camera.update();
-    drawScene();
 }

@@ -88,6 +88,33 @@ class Quat{
 
         return q;
     }
+    
+    static add( q1, q2 ){
+        return new Quat( q1.x + q2.x, q1.y + q2.y, q1.z + q2.z, q1.w + q2.w )
+    }
+
+    /**
+     * 
+     * @param {Quat} q1 Q1 used for calculation, inner dot product of the xyz components
+     * @param {Quat} q2 Q2 used for calculation, inner dot product of the xyz components
+     * @returns 
+     */
+    static innerDot( q1, q2 ){
+        return q1.x * q2.x + q1.y * q2.y + q1.z * q2.z;
+    }
+
+    /**
+     * https://graphics.stanford.edu/courses/cs348a-17-winter/Papers/quaternion.pdf
+     * @param {Quat} p p side of multiplication equation found in paper (not commutative)
+     * @param {Quat} q q side of multiplication equation found in paper (not commutative)
+     */
+    static mult( p, q ){
+        var xs = p.w * q.x + q.w * p.x + p.y * q.z - p.z * q.y;
+        var ys = p.w * q.y + q.w * p.y + p.z * q.x - p.x * q.z;
+        var zs = p.w * q.z + q.w * p.z + p.x * q.y - p.y * q.x;
+        var ws = p.w * q.w - Quat.innerDot( p, q );
+        return new Quat( xs, ys, zs, ws );
+    }
 
     static identity = new Quat( 0, 0, 0, 1 );
     static isEqual( q1, q2 ){
