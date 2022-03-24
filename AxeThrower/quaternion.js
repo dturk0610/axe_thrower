@@ -49,18 +49,43 @@ class Quat{
      * @param {Quat} q 
      */
     static toMat4( q ){
-        var mat1 = mat4(
-            [  q.w,  q.z, -q.y, q.x ],
-            [ -q.z,  q.w,  q.x, q.y ],
-            [  q.y, -q.x,  q.w, q.z ],
-            [ -q.x, -q.y, -q.z, q.w ]
-        );
-        var mat2 = mat4(
-            [  q.w,  q.z, -q.y, -q.x ],
-            [ -q.z,  q.w,  q.x, -q.y ],
-            [  q.y, -q.x,  q.w, -q.z ],
-            [  q.x,  q.y,  q.z,  q.w ]
-        );
-        return transpose( mult( mat1, mat2 ) );
+        var mat1 = [  
+             q.w, -q.z,  q.y, -q.x,
+             q.z,  q.w, -q.x, -q.y,
+            -q.y,  q.x,  q.w, -q.z,
+             q.x,  q.y,  q.z,  q.w
+        ];
+        var mat2 = [
+             q.w, -q.z,  q.y,  q.x,
+             q.z,  q.w, -q.x,  q.y,
+            -q.y,  q.x,  q.w,  q.z,
+            -q.x, -q.y, -q.z,  q.w 
+        ];
+        return Matrix.mult4x4( mat1, mat2 );
+    }
+    
+    /**
+     * https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+     * @param {number} yaw 
+     * @param {number} pitch 
+     * @param {number} roll 
+     * @returns 
+     */
+    static EulerToQuaternion( yaw, pitch, roll ){
+    
+        var cy = Math.cos(yaw * 0.5);
+        var sy = Math.sin(yaw * 0.5);
+        var cp = Math.cos(pitch * 0.5);
+        var sp = Math.sin(pitch * 0.5);
+        var cr = Math.cos(roll * 0.5);
+        var sr = Math.sin(roll * 0.5);
+
+        var q = new Quat();
+        q.w = cr * cp * cy + sr * sp * sy;
+        q.x = sr * cp * cy - cr * sp * sy;
+        q.y = cr * sp * cy + sr * cp * sy;
+        q.z = cr * cp * sy - sr * sp * cy;
+
+        return q;
     }
 }

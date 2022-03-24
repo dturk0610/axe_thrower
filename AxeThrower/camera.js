@@ -8,7 +8,7 @@ class Camera{
      * @param {number} farPlane 
      * @param {number} fov field of view in degrees
      */
-    constructor( position = vec4(0, 0, 0, 1), rotation = new Quat( 0, 0, 0, 1), aspect = 1, nearPlane = .01, farPlane = 1000, fov = 30 ){
+    constructor( position = vec4( 0.0, 0.0, 10.0, 1.0 ), rotation = new Quat( 0.0, 0.0, 0.0, 1.0 ), aspect = 1, nearPlane = .01, farPlane = 1000.0, fov = 30 ){
         this.position = position;
         this.rotation = rotation;
         this.aspect = aspect;
@@ -16,9 +16,8 @@ class Camera{
         this.farPlane = farPlane;
         this.fov = fov * Math.PI / 180.0;
         this.projectionMat = this.constructPerspectiveMat();
-        this.cameraMat = this.calculateCameraMatrix();
+        this.cameraToWorldMatrix = this.calculateCameraMatrix();
         this.viewMat = this.calculateViewMatrix();
-        this.viewProjectMatrix = mult(this.projectionMat, this.viewMat);
     }
 
     // aspect = right/top
@@ -29,26 +28,36 @@ class Camera{
         var invRange = 1.0 / (this.nearPlane - this.farPlane); // the negatives that would be found in the
                                                                // perspective matrix gets absorbed into this
         
-        return mat4(
-         invf/this.aspect,    0,                                         0,                                         0,
-                        0, invf,                                         0,                                         0,
-                        0,    0, (this.farPlane + this.nearPlane)*invRange, 2.0*this.nearPlane*this.farPlane*invRange,  // negatives absorbed into the invRange
-                        0,    0,                                        -1,                                         0
-        );
+        return [
+            invf/this.aspect,  0.0,                                       0.0,  0.0,
+                         0.0, invf,                                       0.0,  0.0,
+                         0.0,  0.0, (this.farPlane + this.nearPlane)*invRange, -1.0,  // negatives absorbed into the invRange
+                         0.0,  0.0, 2.0*this.nearPlane*this.farPlane*invRange,  0.0
+        ];
     }
 
     calculateCameraMatrix = function(){
         var rotMat = Quat.toMat4(this.rotation);
-        var translateMat = mat4(
-                        1, 0, 0, this.position[0],
-                        0, 1, 0, this.position[1],
-                        0, 0, 1, this.position[2],
-                        0, 0, 0,               1 
-        );
-        return mult( rotMat, translateMat );
+        var translateMat = [
+                           1,                0,                0, 0,
+                           0,                1,                0, 0,
+                           0,                0,                1, 0,
+            this.position[0], this.position[1], this.position[2], 1 
+        ];
+        return Matrix.mult4x4( translateMat, rotMat );
     }
 
     calculateViewMatrix = function(){
-        return inverse(this.cameraMat);
+        return Matrix.inverseM4x4(this.cameraToWorldMatrix);
+    }
+
+    move( dir ){
+        
+    } 
+
+    update(){
+        this.projectionMat = this.constructPerspectiveMat();
+        this.cameraToWorldMatrix = this.calculateCameraMatrix();
+        this.viewMat = this.calculateViewMatrix();
     }
 }
