@@ -145,8 +145,6 @@ function drawScene(){
 
         gl.drawElements( gl.TRIANGLES, 3 * numTriangles, gl.UNSIGNED_SHORT, 0 )
     });
-
-    requestAnimationFrame(drawScene);
 }
 
 
