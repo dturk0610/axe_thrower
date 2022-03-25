@@ -167,6 +167,7 @@ function tryClick( canvas, event ){
 var turnAmount = .3;
 function mouseMove( canvas, event ){
     if (mouseDown){
+        var cam = myScene.camera;
         let rect = canvas.getBoundingClientRect();
         let x = event.clientX - rect.left;
         let y = rect.height - (event.clientY - rect.top);
@@ -174,20 +175,20 @@ function mouseMove( canvas, event ){
         var yDiff = parseFloat( y - mouseDownPos[1] );
         //pitch +=  * turnAmount;
         
-        var currRot = myScene.camera.transform.rotation;
+        var currRot = cam.transform.rotation;
 
         if ( Math.abs(xDiff) > Math.abs(yDiff) ){
             var yRotAmountMat = Quat.fromAxisAndAngle( vec3( 0, 1, 0 ), turnAmount*xDiff );
             //console.log(Quat.mult( yRotAmountMat, currRot ));
             currRot = Quat.mult( currRot, yRotAmountMat );
         }else{
-            var currRight = myScene.camera.transform.rightVec;
+            var currRight = cam.transform.rightVec;
             var xRotAmountMat = Quat.fromAxisAndAngle( currRight, -turnAmount*yDiff );
             currRot = Quat.mult( currRot, xRotAmountMat );
         }
-        myScene.camera.transform.rotation = currRot;
+        cam.transform.rotation = currRot;
 
-        myScene.camera.update();
+        cam.update();
         mouseDownPos = vec2( x, y );
         drawScene();
     }
