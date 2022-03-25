@@ -51,21 +51,16 @@ class Camera{
     }
 
     move( dir ){
-        
+        // we are ignoring the y direction so we don't fly away to space
+        var moveAmount = .1;
+        this.transform.position[0] += dir[0] * moveAmount;
+        this.transform.position[2] += dir[2] * moveAmount;
+        this.update();
     } 
 
     update(){
         this.cameraToWorldMatrix = this.calculateCameraMatrix();
         this.viewMat = this.calculateViewMatrix();
         this.transform.updateRotation();
-    }
-
-    moveForward(){
-        var moveAmount = .1;
-        var fwd = this.transform.fwdVec;
-        this.transform.position[0] -= fwd[0] * moveAmount;
-        //this.transform.position[1] -= fwd[1] * moveAmount;
-        this.transform.position[2] -= fwd[2] * moveAmount;
-        this.update();
     }
 }

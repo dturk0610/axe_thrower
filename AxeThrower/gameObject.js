@@ -1,3 +1,20 @@
+
+/**
+ * Welcome to my demise. If you are reading this then I am very surprised. The following classes in
+ * this file will help to build an incredibly reliable game engine like experience so that making
+ * a game in an html application is easier. This is probably the worst idea I have EVER had but, here
+ * we are. I am here writing this at some past time for you and you are reading this in the present.
+ * The idea of this is to have the components of these game objects seperated to that they can be fairly
+ * customizeable. Not only this, but so it is easier to control them through code and using modern tactics
+ * of programing for games or applications. Please send help for this is a very ambitious task for me alone.
+ * Thank jesus I didn't have to implement webgl myself.
+ */
+
+/**
+ * The first class is the straight game object class. This class represents an object that the user wants
+ * in the scene, either to be rendered or to act as a parent-child separator to helps with animations
+ * or more understandable movements.
+ */
 class GameObject{
 
     /**
@@ -16,14 +33,29 @@ class GameObject{
         this.worldMat = this.calcWorldMat();
     }
     
+    /**
+     * This will likely be moved to a different class later as some game object may not necesarily
+     * need verticies.
+     * @returns the verticies comprising the object
+     */
     getVertices(){
         return this.verts;
     }
 
+    /**
+     * This will likely be moved to a different class later as some game object may not necesarily
+     * need verticies.
+     * @returns the indicies comprising the object
+     */
     getFaces(){
         return this.indices;
     }
 
+    /**
+     * Eventually this will be a bit more complex as I plan to add in a child-parent relationship
+     * so that objects can have a more hierarchical like structure
+     * @returns the transform matrix, local to world matrix.
+     */
     calcWorldMat(){
         return this.transform.calcWorldMat();
     }
@@ -31,8 +63,9 @@ class GameObject{
 }
 
 /**
- * This class will house my take on the primitive type of quad, or otherwise known as a bounded
- * plane.
+ * The second class will house my take on the primitive type of quad, or otherwise understood as 
+ * a bounded plane. Where a plane streches to infinity, this will only strech to the width and
+ * depth of the square.
  */
 class Quad{
 
@@ -44,7 +77,7 @@ class Quad{
      * @param {Quat} rotation 
      * @returns 
      */
-    constructor( width, depth, position = vec4( 0.0, 0.0, 0.0, 1.0 ), rotation = new Quat( 0.0, 0.0, 0.0, 1.0 ), scale = vec3( 1, 1, 1 ) ){
+    constructor( width = 1, depth = 1, position = vec4( 0.0, 0.0, 0.0, 1.0 ), rotation = new Quat( 0.0, 0.0, 0.0, 1.0 ), scale = vec3( 1, 1, 1 ) ){
         // While these verts are layed out in a row maner, they are still expressed in the matrix as a 
         // column
         this.verts = [

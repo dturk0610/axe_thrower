@@ -186,16 +186,13 @@ function mouseMove( canvas, event ){
         //pitch +=  * turnAmount;
         
         var currRot = cam.transform.rotation;
+        var currRight = cam.transform.rightVec;
+        var xRotAmountMat = Quat.fromAxisAndAngle( currRight, -turnAmount*yDiff );
+        currRot = Quat.mult( currRot, xRotAmountMat );
+        var yRotAmountMat = Quat.fromAxisAndAngle( vec3( 0, 1, 0 ), turnAmount*xDiff );
+        //console.log(Quat.mult( yRotAmountMat, currRot ));
+        currRot = Quat.mult( currRot, yRotAmountMat );
 
-        if ( Math.abs(xDiff) > Math.abs(yDiff) ){
-            var yRotAmountMat = Quat.fromAxisAndAngle( vec3( 0, 1, 0 ), turnAmount*xDiff );
-            //console.log(Quat.mult( yRotAmountMat, currRot ));
-            currRot = Quat.mult( currRot, yRotAmountMat );
-        }else{
-            var currRight = cam.transform.rightVec;
-            var xRotAmountMat = Quat.fromAxisAndAngle( currRight, -turnAmount*yDiff );
-            currRot = Quat.mult( currRot, xRotAmountMat );
-        }
         cam.transform.rotation = currRot;
 
         cam.update();
@@ -216,12 +213,21 @@ function endClick( canvas, event ){
 
 var keyW = false, keyA = false, keyS = false, keyD = false;
 function onKeyDown(event) {
+    var rightVec = myScene.camera.transform.rightVec;
+    var fwdVec = myScene.camera.transform.fwdVec; // To actually move forward we need the negative of this
+    var totDir = vec3( 0, 0, 0 );
     var keyCode = event.keyCode;
     switch (keyCode) {
-        case 87: keyW = true; myScene.camera.moveForward(); drawScene(); break; // w
-        case 65: keyA = true; break; // a
-        case 83: keyS = true; break; // s
-        case 68: keyD = true; break; // d 
+        case 87: totDir[0] -= fwdVec[0];    totDir[1] -= fwdVec[1];     totDir[2] -= fwdVec[2];     break; // w
+        case 65: totDir[0] -= rightVec[0];  totDir[1] -= rightVec[1];   totDir[2] -= rightVec[2];   break; // a
+        case 83: totDir[0] += fwdVec[0];    totDir[1] += fwdVec[1];     totDir[2] += fwdVec[2];     break; // s
+        case 68: totDir[0] += rightVec[0];  totDir[1] += rightVec[1];   totDir[2] += rightVec[2];   break; // d 
+    }
+
+    if ( totDir[0] != 0 || totDir[1] != 0 || totDir[2] != 0 ){
+        totDir = normalize( totDir );
+        myScene.camera.move( totDir );
+        drawScene();
     }
 }
 function onKeyUp(event) {

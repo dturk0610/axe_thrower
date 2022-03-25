@@ -1,6 +1,7 @@
 class Quat{
 
     /**
+     * Constructor for the quaternion class
      * http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-17-quaternions/
      * @param {number} x Rotation axis x * sin( rotationangle / 2 )
      * @param {number} y Rotation axis y * sin( rotationangle / 2 )
@@ -15,7 +16,7 @@ class Quat{
     }
 
     /**
-     * 
+     * Rebuilds the current quaternion so that its new axis and angle are the ones entered
      * @param {vec3} axis axis to rotate around
      * @param {number} angle angle in degress to rotate around by
      */
@@ -30,9 +31,9 @@ class Quat{
 
     /**
      * 
-     * @param {vec3} axis axis to rotate around
-     * @param {number} angle angle in degress to rotate around by
-     * @returns new Quat built from rotation axis and angle
+     * @param {vec3} axis axis to rotate around.
+     * @param {number} angle angle in degress to rotate around by.
+     * @returns new quaternion built from rotation axis and angle.
      */
     static fromAxisAndAngle( axis, angle ){
         axis = normalize(axis); // makes sure that the axis is truly normalized
@@ -45,8 +46,10 @@ class Quat{
     }
 
     /**
+     * The matrix implemented here can be found at this url.
      * https://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/index.htm
      * @param {Quat} q 
+     * @returns A 4x4 rotation matrix that this quaternion represents.
      */
     static toMat4( q ){
         var mat1 = [  
@@ -65,11 +68,13 @@ class Quat{
     }
     
     /**
+     * Understanding how to go from euler angels to quaternions is a pretty important
+     * precedure, the url below as of first writing this better explains this process.
      * https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
-     * @param {number} yaw 
-     * @param {number} pitch 
-     * @param {number} roll 
-     * @returns 
+     * @param {number} yaw.
+     * @param {number} pitch.
+     * @param {number} roll.
+     * @returns a quaternion based on the yaw, pitch and roll entered.
      */
     static EulerToQuaternion( yaw, pitch, roll ){
     
@@ -89,24 +94,33 @@ class Quat{
         return q;
     }
     
+    /**
+     * straight linear addition of quaternions.
+     * @param {Quat} q1.
+     * @param {Quat} q2.
+     * @returns the added quaternions.
+     */
     static add( q1, q2 ){
         return new Quat( q1.x + q2.x, q1.y + q2.y, q1.z + q2.z, q1.w + q2.w )
     }
 
     /**
-     * 
-     * @param {Quat} q1 Q1 used for calculation, inner dot product of the xyz components
-     * @param {Quat} q2 Q2 used for calculation, inner dot product of the xyz components
-     * @returns 
+     * This does the dot product of the inner xyz values.
+     * @param {Quat} q1 Q1 used for calculation, inner dot product of the xyz components.
+     * @param {Quat} q2 Q2 used for calculation, inner dot product of the xyz components.
+     * @returns a float value representing the inner dot product of the quaternion.
      */
     static innerDot( q1, q2 ){
         return q1.x * q2.x + q1.y * q2.y + q1.z * q2.z;
     }
 
     /**
+     * Once again, this method was found on the listed paper/url. This one is coming from
+     * an actual mathematical paper though, so I trust it more than wikipedia...
      * https://graphics.stanford.edu/courses/cs348a-17-winter/Papers/quaternion.pdf
      * @param {Quat} p p side of multiplication equation found in paper (not commutative)
      * @param {Quat} q q side of multiplication equation found in paper (not commutative)
+     * @returns a new quaternion that is the resulting multiplication of the two entered.
      */
     static mult( p, q ){
         var xs = p.w * q.x + q.w * p.x + p.y * q.z - p.z * q.y;
@@ -116,7 +130,19 @@ class Quat{
         return new Quat( xs, ys, zs, ws );
     }
 
+    /**
+     * Not a necessary attribute, but could prove to be useful. This is just the
+     * starting quaternion that objects will have.
+     */
     static identity = new Quat( 0, 0, 0, 1 );
+
+    /**
+     * Straight forward comparison of the two input quaternions. Later it would be
+     * smart to add in floating point error edge case scenarios.
+     * @param {Quat} q1 
+     * @param {Quat} q2 
+     * @returns true or false depending on if the quaternions are determined to be equal
+     */
     static isEqual( q1, q2 ){
         return ( q1.x == q2.x && q1.y == q2.y && q1.z == q2.z && q1.w == q2.w );
     }
