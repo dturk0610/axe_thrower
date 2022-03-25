@@ -70,7 +70,7 @@ function setupGL(){
 
 function setupScene(){
     
-    var cam = new Camera( vec3( 0, 1, 0, 1 ), new Quat( 0, 0, 0, 1 ), w/h, .3, 4000, 60 );
+    var cam = new Camera( vec3( 0, 1, 0, 1 ), new Quat( 0, 0, 0, 1 ), w/h, .01, 4000, 60 );
     myScene = new Scene( cam );
 
     var floor = new Quad( 10, 10, vec4( 0, 0, 0, 1), new Quat( 0, 0, 0, 1 ));
@@ -78,22 +78,22 @@ function setupScene(){
     floor.color = vec4( 1, 0, 0, 1 );
     myScene.addObject( floor );
 
-    var wall1 = new Quad( 10, 10, vec4( 0, 5, 5, 1), Quat.fromAxisAndAngle( vec3( 1, 0, 0 ), 90 ));
+    var wall1 = new Quad( 10, 2, vec4(  0, 1, 5, 1), Quat.fromAxisAndAngle( vec3( 1, 0, 0 ), 90 ));
     wall1.program = floorShader;
     wall1.color = vec4( 1, 1, 0, 1 );
     myScene.addObject( wall1 );
 
-    var wall2 = new Quad( 10, 10, vec4( 5, 5, 0, 1), Quat.fromAxisAndAngle( vec3( 0, 0, -1 ), 90 ));
+    var wall2 = new Quad( 2, 10, vec4(  5, 1, 0, 1), Quat.fromAxisAndAngle( vec3( 0, 0, -1 ), 90 ));
     wall2.program = floorShader;
     wall2.color = vec4( 0, 1, 0, 1 );
     myScene.addObject( wall2 );
 
-    var wall3 = new Quad( 10, 10, vec4( 0, 5, -5, 1), Quat.fromAxisAndAngle( vec3( -1, 0, 0 ), 90 ));
+    var wall3 = new Quad( 10, 2, vec4(  0, 1, -5, 1), Quat.fromAxisAndAngle( vec3( -1, 0, 0 ), 90 ));
     wall3.program = floorShader;
     wall3.color = vec4( 0, 0, 1, 1 );
     myScene.addObject( wall3 );
 
-    var wall4 = new Quad( 10, 10, vec4( -5, 5, 0, 1), Quat.fromAxisAndAngle( vec3( 0, 0, 1 ), 90 ));
+    var wall4 = new Quad( 2, 10, vec4( -5, 1, 0, 1), Quat.fromAxisAndAngle( vec3( 0, 0, 1 ), 90 ));
     wall4.program = floorShader;
     wall4.color = vec4( 0.8, 0.2, 1, 1 );
     myScene.addObject( wall4 );
@@ -179,9 +179,10 @@ function mouseMove( canvas, event ){
         if ( Math.abs(xDiff) > Math.abs(yDiff) ){
             var yRotAmountMat = Quat.fromAxisAndAngle( vec3( 0, 1, 0 ), turnAmount*xDiff );
             //console.log(Quat.mult( yRotAmountMat, currRot ));
-            currRot = Quat.mult( yRotAmountMat, currRot );
+            currRot = Quat.mult( currRot, yRotAmountMat );
         }else{
-            var xRotAmountMat = Quat.fromAxisAndAngle( vec3( 1, 0, 0 ), -turnAmount*yDiff );
+            var currRight = myScene.camera.transform.rightVec;
+            var xRotAmountMat = Quat.fromAxisAndAngle( currRight, -turnAmount*yDiff );
             currRot = Quat.mult( currRot, xRotAmountMat );
         }
         myScene.camera.transform.rotation = currRot;

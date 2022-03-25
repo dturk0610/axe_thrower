@@ -61,10 +61,10 @@ class Camera{
     }
 
     moveForward(){
-        var moveAmount = .05;
+        var moveAmount = .1;
         var fwd = this.transform.fwdVec;
         this.transform.position[0] -= fwd[0] * moveAmount;
-        this.transform.position[1] -= fwd[1] * moveAmount;
+        //this.transform.position[1] -= fwd[1] * moveAmount;
         this.transform.position[2] -= fwd[2] * moveAmount;
         this.update();
     }
