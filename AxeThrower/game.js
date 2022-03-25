@@ -73,30 +73,40 @@ function setupScene(){
     var cam = new Camera( vec3( 0, 1, 0, 1 ), new Quat( 0, 0, 0, 1 ), w/h, .01, 4000, 60 );
     myScene = new Scene( cam );
 
-    var floor = new Quad( 10, 10, vec4( 0, 0, 0, 1), new Quat( 0, 0, 0, 1 ));
+    var floor = new Quad( 10, 10, vec4( 0, 0, 0, 1), new Quat( 0, 0, 0, 1 ), vec3( 1, 1, 1 ) );
     floor.program = floorShader;
     floor.color = vec4( 1, 0, 0, 1 );
     myScene.addObject( floor );
 
-    var wall1 = new Quad( 10, 2, vec4(  0, 1, 5, 1), Quat.fromAxisAndAngle( vec3( 1, 0, 0 ), 90 ));
+    var wall1 = new Quad( 10, 2, vec4(  0, 1, 5, 1), Quat.fromAxisAndAngle( vec3( 1, 0, 0 ), 90 ), vec3( 1, 1, 1 ) );
     wall1.program = floorShader;
     wall1.color = vec4( 1, 1, 0, 1 );
     myScene.addObject( wall1 );
 
-    var wall2 = new Quad( 2, 10, vec4(  5, 1, 0, 1), Quat.fromAxisAndAngle( vec3( 0, 0, -1 ), 90 ));
+    var yTurn = Quat.fromAxisAndAngle( vec3( 0, 1, 0 ), 90 );
+    var zTurn = Quat.fromAxisAndAngle( vec3( 0, 0, -1 ), 90 );
+    var wall2 = new Quad( 10, 2, vec4(  5, 1, 0, 1), Quat.mult( yTurn, zTurn ), vec3( 1, 1, 1 ) );
     wall2.program = floorShader;
     wall2.color = vec4( 0, 1, 0, 1 );
     myScene.addObject( wall2 );
 
-    var wall3 = new Quad( 10, 2, vec4(  0, 1, -5, 1), Quat.fromAxisAndAngle( vec3( -1, 0, 0 ), 90 ));
+    var wall3 = new Quad( 10, 2, vec4(  0, 1, -5, 1), Quat.fromAxisAndAngle( vec3( -1, 0, 0 ), 90 ), vec3( 1, 1, 1 ) );
     wall3.program = floorShader;
     wall3.color = vec4( 0, 0, 1, 1 );
     myScene.addObject( wall3 );
 
-    var wall4 = new Quad( 2, 10, vec4( -5, 1, 0, 1), Quat.fromAxisAndAngle( vec3( 0, 0, 1 ), 90 ));
+    var yTurn = Quat.fromAxisAndAngle( vec3( 0, 1, 0 ), 90 );
+    var zTurn = Quat.fromAxisAndAngle( vec3( 0, 0, 1 ), 90 );
+    var wall4 = new Quad( 10, 2, vec4( -5, 1, 0, 1), Quat.mult( yTurn, zTurn ), vec3( 1, 1, 1 ) );
     wall4.program = floorShader;
     wall4.color = vec4( 0.8, 0.2, 1, 1 );
     myScene.addObject( wall4 );
+
+
+    var chair = new GameObject( "chair", vec4( 0, .5, -4, 1 ), Quat.identity, vec3( .02, .02, .02 ), getChairVertices(), getChairFaces() );
+    chair.program = floorShader;
+    chair.color = vec4( 0.8, 0.2, .4, 1 );
+    myScene.addObject( chair );
 
 }
 
