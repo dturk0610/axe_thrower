@@ -160,6 +160,8 @@ function drawScene(){
 
         gl.drawElements( gl.TRIANGLES, 3 * numTriangles, gl.UNSIGNED_SHORT, 0 )
     });
+
+    requestAnimationFrame(drawScene);
 }
 
 var mouseDown = false;
@@ -197,7 +199,7 @@ function mouseMove( canvas, event ){
 
         cam.update();
         mouseDownPos = vec2( x, y );
-        drawScene();
+        //drawScene();
     }
 }
 
@@ -227,7 +229,7 @@ function onKeyDown(event) {
     if ( totDir[0] != 0 || totDir[1] != 0 || totDir[2] != 0 ){
         totDir = normalize( totDir );
         myScene.camera.move( totDir );
-        drawScene();
+        //drawScene();
     }
 }
 function onKeyUp(event) {
