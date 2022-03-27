@@ -25,31 +25,12 @@ class GameObject{
      * @param {[vec3]} verts 
      * @param {[int]} indices 
      */
-    constructor( tag = "new game object", position = vec4( 0, 0, 0, 1 ), rotation = new Quat( 0, 0, 0, 1 ), scale = vec3( 1, 1, 1 ), verts = [], indices = [] ){
+    constructor( tag = "new game object", position = vec4( 0, 0, 0, 1 ), rotation = new Quat( 0, 0, 0, 1 ), scale = vec3( 1, 1, 1 ) ){
         this.tag = tag;
         this.transform = new Transform( position, rotation, scale );
-        this.verts = verts;
-        this.indices = indices;
         this.worldMat = this.calcWorldMat();
     }
-    
-    /**
-     * This will likely be moved to a different class later as some game object may not necesarily
-     * need verticies.
-     * @returns the verticies comprising the object
-     */
-    getVertices(){
-        return this.verts;
-    }
 
-    /**
-     * This will likely be moved to a different class later as some game object may not necesarily
-     * need verticies.
-     * @returns the indicies comprising the object
-     */
-    getFaces(){
-        return this.indices;
-    }
 
     /**
      * Eventually this will be a bit more complex as I plan to add in a child-parent relationship
@@ -80,17 +61,19 @@ class Quad{
     constructor( width = 1, depth = 1, position = vec4( 0.0, 0.0, 0.0, 1.0 ), rotation = new Quat( 0.0, 0.0, 0.0, 1.0 ), scale = vec3( 1, 1, 1 ) ){
         // While these verts are layed out in a row maner, they are still expressed in the matrix as a 
         // column
-        this.verts = [
+        var verts = [
              vec4( -width * 0.5, 0.0, -depth * 0.5, 1.0 ),
              vec4( -width * 0.5, 0.0,  depth * 0.5, 1.0 ),
              vec4(  width * 0.5, 0.0,  depth * 0.5, 1.0 ),
              vec4(  width * 0.5, 0.0, -depth * 0.5, 1.0 )
         ];
-        this.indices = [ 0, 1, 2,
+        var indexList = [ 0, 1, 2,
                          0, 2, 3 ];
         this.depth = depth;
         this.width = width;
-        return new GameObject( "new Quad", position, rotation, scale , this.verts, this.indices );
+        var gO = new GameObject( "new Quad", position, rotation, scale , this.verts, this.indices );
+        gO.mesh = new Mesh( verts, indexList )
+        return gO;
     }
 }
 
@@ -156,8 +139,102 @@ class Transform{
  */
 class Mesh{
 
-    constructor(  verts = [], indicies = [] ){
+    constructor(  verts = [], indices = [] ){
+        this.verts = verts;
+        this.numVertices = verts.length;
+        this.indices = indices;
+        this.numTriangles = indices.length/3;
+        this.faceNormals = this.getFaceNormals();
+        this.vertexNormals = this.getVertexNormals();
+    }
+  
+    /**
+     * This will likely be moved to a different class later as some game object may not necesarily
+     * need verticies.
+     * @returns the verticies comprising the object
+     */
+     getVertices(){
+        return this.verts;
+    }
 
+    /**
+     * This will likely be moved to a different class later as some game object may not necesarily
+     * need verticies.
+     * @returns the indicies comprising the object
+     */
+    getFaces(){
+        return this.indices;
+    }
+
+    // The following function takes in vertices, indexList, and numTriangles
+    // and outputs the face normals
+    getFaceNormals() {
+        
+        var vertices = this.verts;
+        var indexList = this.indices;
+        var numTriangles = this.numTriangles;
+        var faceNormals=[];
+        // Iterate through all the triangles (i.e., from 0 to numTriangles-1)
+        for (var i = 0; i < numTriangles; i++) {
+            var p0 = vec3( vertices[indexList[3*i]][0], vertices[indexList[3*i]][1], vertices[indexList[3*i]][2] );
+            var p1 = vec3( vertices[indexList[3*i + 1]][0], vertices[indexList[3*i + 1]][1], vertices[indexList[3*i + 1]][2] );
+            var p2 = vec3( vertices[indexList[3*i + 2]][0], vertices[indexList[3*i + 2]][1], vertices[indexList[3*i + 2]][2] );
+
+            var p1minusp0 = vec3( p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2] );
+            var p2minusp0 = vec3( p2[0] - p0[0], p2[1] - p0[1], p2[2] - p0[2] );
+            var faceNormal = cross( p1minusp0, p2minusp0 );
+            faceNormal = normalize( faceNormal );
+            faceNormals.push( faceNormal );
+        }
+        // return the array of face normals
+        return faceNormals;
+    }
+    // The following function takes in vertices, indexList, faceNormals, numVertices, and numTriangles,
+    // and outputs the vertex normals
+    getVertexNormals() {
+        // This function provides a simple method to get vertex normals. There are
+        // faster methods to get them.
+        var vertexNormals=[];
+        var faceNormals = this.faceNormals;
+        var indexList = this.indices;
+        var numVertices = this.verts.length;
+        var numTriangles = this.numTriangles;
+        // Iterate through all the vertices
+        for (var j = 0; j < numVertices; j++) {
+            var vertexNormal = vec3( 0, 0, 0 );
+            // Iterate through triangles
+            for (var i = 0; i < numTriangles; i++) {
+                if ( indexList[3*i] == j | indexList[3*i + 1] == j | indexList[3*i + 2] == j ){
+                    vertexNormal[0] = vertexNormal[0] + faceNormals[i][0];
+                    vertexNormal[1] = vertexNormal[1] + faceNormals[i][1];
+                    vertexNormal[2] = vertexNormal[2] + faceNormals[i][2];
+                }
+            }
+            vertexNormal = normalize( vertexNormal );
+            vertexNormals.push( vertexNormal );
+        }
+
+        // return the array of vertex normals
+        return vertexNormals;
+    }
+}
+
+class MeshRenderer{
+
+    static gl;
+
+    static setGL ( gl ) { MeshRenderer.gl = gl; };
+
+    constructor( gameObj, shaderProgram, setupFunc, renderFunc ){
+        this.gameObject = gameObj;
+        this.shaderProgram = shaderProgram;
+        this.renderFunc = renderFunc;
+        this.gl = MeshRenderer.gl;
+        setupFunc( shaderProgram, this );
+    }
+
+    render(){
+        this.renderFunc();
     }
 
 

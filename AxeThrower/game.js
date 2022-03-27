@@ -63,6 +63,7 @@ function setupGL(){
     gl.enable(gl.DEPTH_TEST);
     gl.viewport( 0, 0, w, h );
     gl.clearColor( 0.0, 0.0, 0.0, 1.0 );
+    MeshRenderer.setGL(gl);
     
     floorShader =  initShaders( gl, "vertex-shader-quad", "fragment-shader" );
 }
@@ -73,38 +74,79 @@ function setupScene(){
     var cam = new Camera( vec3( 0, 1, 0, 1 ), new Quat( 0, 0, 0, 1 ), w/h, .01, 4000, 60 );
     myScene = new Scene( cam );
 
+    var baseObjRenderSetup = function( shaderProgram, meshRenederer ){
+        meshRenederer.indexBuffer = this.gl.createBuffer();
+        meshRenederer.verticesBuffer = this.gl.createBuffer();
+        meshRenederer.vertexPosition = this.gl.getAttribLocation( shaderProgram, "vertexPosition");
+        meshRenederer.perspectiveProjectionMatricLocation = this.gl.getUniformLocation( shaderProgram, "viewProjectMat" );
+        meshRenederer.worldMatLocation = this.gl.getUniformLocation( shaderProgram, "worldMat" );
+        meshRenederer.colUniformLocation = this.gl.getUniformLocation( shaderProgram, "col" );
+    }
+
+    var baseObjReneder = function(){
+        this.gl.useProgram( this.shaderProgram );
+
+        var mesh = this.gameObject.mesh;
+
+
+        var numVerts = mesh.numVertices;
+        var numTriangles = mesh.numTriangles;
+
+        var verts = mesh.getVertices();
+        var indexList = mesh.getFaces();
+
+        this.gl.bindBuffer( this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer );
+        this.gl.bufferData( this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexList), this.gl.STATIC_DRAW );
+        this.gl.bindBuffer( this.gl.ARRAY_BUFFER, this.verticesBuffer );
+        this.gl.bufferData( this.gl.ARRAY_BUFFER, flatten(verts), this.gl.STATIC_DRAW );
+        this.gl.vertexAttribPointer( this.vertexPosition, 4, this.gl.FLOAT, false, 0, 0 );
+        this.gl.enableVertexAttribArray( this.vertexPosition );
+
+        var projectionMat = Scene.mainCam.projectionMat;
+        var viewMat = Scene.mainCam.viewMat;
+        var viewProjectMat = Matrix.mult4x4( projectionMat, viewMat );
+
+        this.gl.uniformMatrix4fv( this.perspectiveProjectionMatricLocation, false, flatten( viewProjectMat ) );
+        this.gl.uniformMatrix4fv( this.worldMatLocation, false, flatten( this.gameObject.worldMat ) );
+        
+        var color = this.gameObject.color;
+        this.gl.uniform4f( this.colUniformLocation, color[0], color[1], color[2], color[3] );
+        this.gl.drawElements( this.gl.TRIANGLES, 3 * numTriangles, this.gl.UNSIGNED_SHORT, 0 )
+    }
+
     var floor = new Quad( 10, 10, vec4( 0, 0, 0, 1), new Quat( 0, 0, 0, 1 ), vec3( 1, 1, 1 ) );
-    floor.program = floorShader;
+    floor.meshRenderer = new MeshRenderer( floor, floorShader, baseObjRenderSetup, baseObjReneder );
     floor.color = vec4( 1, 0, 0, 1 );
     myScene.addObject( floor );
 
     var wall1 = new Quad( 10, 2, vec4(  0, 1, 5, 1), Quat.fromAxisAndAngle( vec3( 1, 0, 0 ), 90 ), vec3( 1, 1, 1 ) );
-    wall1.program = floorShader;
+    wall1.meshRenderer = new MeshRenderer( wall1, floorShader, baseObjRenderSetup, baseObjReneder );
     wall1.color = vec4( 1, 1, 0, 1 );
     myScene.addObject( wall1 );
 
     var yTurn = Quat.fromAxisAndAngle( vec3( 0, 1, 0 ), 90 );
     var zTurn = Quat.fromAxisAndAngle( vec3( 0, 0, -1 ), 90 );
     var wall2 = new Quad( 10, 2, vec4(  5, 1, 0, 1), Quat.mult( yTurn, zTurn ), vec3( 1, 1, 1 ) );
-    wall2.program = floorShader;
+    wall2.meshRenderer = new MeshRenderer( wall2, floorShader, baseObjRenderSetup, baseObjReneder );
     wall2.color = vec4( 0, 1, 0, 1 );
     myScene.addObject( wall2 );
 
     var wall3 = new Quad( 10, 2, vec4(  0, 1, -5, 1), Quat.fromAxisAndAngle( vec3( -1, 0, 0 ), 90 ), vec3( 1, 1, 1 ) );
-    wall3.program = floorShader;
+    wall3.meshRenderer = new MeshRenderer( wall3, floorShader, baseObjRenderSetup, baseObjReneder );
     wall3.color = vec4( 0, 0, 1, 1 );
     myScene.addObject( wall3 );
 
     var yTurn = Quat.fromAxisAndAngle( vec3( 0, 1, 0 ), 90 );
     var zTurn = Quat.fromAxisAndAngle( vec3( 0, 0, 1 ), 90 );
     var wall4 = new Quad( 10, 2, vec4( -5, 1, 0, 1), Quat.mult( yTurn, zTurn ), vec3( 1, 1, 1 ) );
-    wall4.program = floorShader;
+    wall4.meshRenderer = new MeshRenderer( wall4, floorShader, baseObjRenderSetup, baseObjReneder );
     wall4.color = vec4( 0.8, 0.2, 1, 1 );
     myScene.addObject( wall4 );
 
 
-    var chair = new GameObject( "chair", vec4( 0, .5, -4, 1 ), Quat.identity, vec3( .02, .02, .02 ), getChairVertices(), getChairFaces() );
-    chair.program = floorShader;
+    var chair = new GameObject( "chair", vec4( 0, .5, -4, 1 ), Quat.identity, vec3( .02, .02, .02 ) );
+    chair.mesh = new Mesh( getChairVertices(), getChairFaces() );
+    chair.meshRenderer = new MeshRenderer( chair, floorShader, baseObjRenderSetup, baseObjReneder );
     chair.color = vec4( 0.8, 0.2, .4, 1 );
     myScene.addObject( chair );
 
@@ -117,48 +159,9 @@ function drawScene(){
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
 
     myScene.objects.forEach( obj => {
-        var currProgram = obj.program;
-        gl.useProgram( currProgram );
-
-        var numVerts = obj.verts.length;
-        var numTriangles = obj.indices.length/3;
-
-        var verts = obj.getVertices();
-
-
-        //console.log(verts);
-        var indexList = obj.getFaces();
-
-        var indexBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexList), gl.STATIC_DRAW);
-
-        var verticesBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, verticesBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, flatten(verts), gl.STATIC_DRAW);
-
-        var vertexPosition = gl.getAttribLocation(currProgram, "vertexPosition");
-        gl.vertexAttribPointer( vertexPosition, 4, gl.FLOAT, false, 0, 0 );
-        gl.enableVertexAttribArray( vertexPosition );
-
-        var projectionMat = cam.projectionMat;
-        var viewMat = cam.viewMat;
-        var viewProjectMat = Matrix.mult4x4( projectionMat, viewMat );
-
-        // for (var i = 0; i < numVerts; i++){
-        //     console.log(Matrix.vecMatMult(verts[i], projectionMat ));
-        // }
-        var perspectiveProjectionMatricLocation = gl.getUniformLocation( currProgram, "viewProjectMat" );
-        gl.uniformMatrix4fv( perspectiveProjectionMatricLocation, false, flatten( viewProjectMat ) );
-
-        var worldMatLocation = gl.getUniformLocation( currProgram, "worldMat" );
-        gl.uniformMatrix4fv( worldMatLocation, false, flatten( obj.worldMat ) );
-        
-        var colUniformLocation = gl.getUniformLocation( currProgram, "col" );
-        var color = obj.color;
-        gl.uniform4f( colUniformLocation, color[0], color[1], color[2], color[3] );
-
-        gl.drawElements( gl.TRIANGLES, 3 * numTriangles, gl.UNSIGNED_SHORT, 0 )
+        if (obj.meshRenderer !== undefined){
+            obj.meshRenderer.render();
+        }        
     });
 
     requestAnimationFrame(drawScene);
@@ -240,52 +243,4 @@ function onKeyUp(event) {
         case 83: keyS = false; break; // s
         case 68: keyD = false; break; // d
     }
-}
-
-
-// The following function takes in vertices, indexList, and numTriangles
-// and outputs the face normals
-function getFaceNormals( vertices, indexList, numTriangles ) {
-    var faceNormals=[];
-    // Iterate through all the triangles (i.e., from 0 to numTriangles-1)
-    for (var i = 0; i < numTriangles; i++) {
-        var p0 = vec3( vertices[indexList[3*i]][0], vertices[indexList[3*i]][1], vertices[indexList[3*i]][2] );
-        var p1 = vec3( vertices[indexList[3*i + 1]][0], vertices[indexList[3*i + 1]][1], vertices[indexList[3*i + 1]][2] );
-        var p2 = vec3( vertices[indexList[3*i + 2]][0], vertices[indexList[3*i + 2]][1], vertices[indexList[3*i + 2]][2] );
-
-        var p1minusp0 = vec3( p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2] );
-        var p2minusp0 = vec3( p2[0] - p0[0], p2[1] - p0[1], p2[2] - p0[2] );
-        var faceNormal = cross( p1minusp0, p2minusp0 );
-        faceNormal = normalize( faceNormal );
-        faceNormals.push( faceNormal );
-    }
-    // return the array of face normals
-    return faceNormals;
-}
-
-// The following function takes in vertices, indexList, faceNormals, numVertices, and numTriangles,
-// and outputs the vertex normals
-function getVertexNormals( vertices, indexList, faceNormals, numVertices, numTriangles ) {
-    // This function provides a simple method to get vertex normals. There are
-    // faster methods to get them.
-    var vertexNormals=[];
-    // Iterate through all the vertices
-    for (var j = 0; j < numVertices; j++) {
-        
-        var vertexNormal = vec3( 0, 0, 0 );
-        // Iterate through triangles
-        for (var i = 0; i < numTriangles; i++) {
-            if ( indexList[3*i] == j | indexList[3*i + 1] == j | indexList[3*i + 2] == j ){
-                vertexNormal[0] = vertexNormal[0] + faceNormals[i][0];
-                vertexNormal[1] = vertexNormal[1] + faceNormals[i][1];
-                vertexNormal[2] = vertexNormal[2] + faceNormals[i][2];
-            }
-        }
-        
-        vertexNormal = normalize( vertexNormal );
-        vertexNormals.push( vertexNormal );
-    }
-
-    // return the array of vertex normals
-    return vertexNormals;
 }
