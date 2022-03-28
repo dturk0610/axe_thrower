@@ -72,7 +72,7 @@ function setupGL(){
 
 function setupScene(){
     
-    var cam = new Camera( vec3( 0, 1, 0, 1 ), new Quat( 0, 0, 0, 1 ), w/h, .01, 4000, 60 );
+    var cam = new Camera( vec3( 0, 1, 0, 1 ), new Quat( 0, 0, 0, 1 ), w/h, .01, 4000, 60, -w*0.5, w*0.5, h*0.5, -h*0.5 );
     myScene = new Scene( cam );
 
     var baseObjRenderSetup = function( shaderProgram, meshRenederer ){
@@ -161,8 +161,15 @@ function setupScene(){
         gl.enableVertexAttribArray( this.vertexNormalPointer );
 
         var cam = Scene.mainCam;
+        var projectionMat;
+        if (!cam.orthoOn){
+            projectionMat = cam.projectionMat;
+        }
+        else{
+            projectionMat = cam.orthoMat;
+        }
 
-        var projectionMat = cam.projectionMat;
+
         var viewMat = cam.viewMat;
         var viewProjectMat = Matrix.mult4x4( projectionMat, viewMat );
         var worldMat = this.gameObject.worldMat;
@@ -310,6 +317,7 @@ function onKeyDown(event) {
         case 65: totDir[0] -= rightVec[0];  totDir[1] -= rightVec[1];   totDir[2] -= rightVec[2];   break; // a
         case 83: totDir[0] += fwdVec[0];    totDir[1] += fwdVec[1];     totDir[2] += fwdVec[2];     break; // s
         case 68: totDir[0] += rightVec[0];  totDir[1] += rightVec[1];   totDir[2] += rightVec[2];   break; // d 
+        case 79: Scene.mainCam.orthoOn = !Scene.mainCam.orthoOn; console.log(Scene.mainCam.orthoMat); break;
     }
 
     if ( totDir[0] != 0 || totDir[1] != 0 || totDir[2] != 0 ){
