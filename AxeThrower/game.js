@@ -196,37 +196,38 @@ function setupScene(){
         gl.drawElements( gl.TRIANGLES, 3 * numTriangles, gl.UNSIGNED_SHORT, 0 );
     }
 
+    var brownCol = vec4( 66.0/256.0, 40.0/256.0, 14.0/256.0, 1.0 );
     var floor = new Quad( 10, 10, vec4( 0, 0, 0, 1), new Quat( 0, 0, 0, 1 ), vec3( 1, 1, 1 ) );
     floor.meshRenderer = new MeshRenderer( floor, floorShader, baseObjRenderSetup, baseObjReneder );
-    floor.color = vec4( 1, 0, 0, 1 );
+    floor.color = brownCol;
     myScene.addObject( floor );
 
     var wall1 = new Quad( 10, 2, vec4(  0, 1, 5, 1), Quat.fromAxisAndAngle( vec3( 1, 0, 0 ), 90 ), vec3( 1, 1, 1 ) );
     wall1.meshRenderer = new MeshRenderer( wall1, lightShader, lightObjRenderSetup, lightObjReneder );
-    wall1.color = vec4( 1, 1, 0, 1 );
+    wall1.color = brownCol;
     myScene.addObject( wall1 );
 
     var yTurn = Quat.fromAxisAndAngle( vec3( 0, 1, 0 ), 90 );
     var zTurn = Quat.fromAxisAndAngle( vec3( 0, 0, -1 ), 90 );
     var wall2 = new Quad( 10, 2, vec4(  5, 1, 0, 1), Quat.mult( yTurn, zTurn ), vec3( 1, 1, 1 ) );
     wall2.meshRenderer = new MeshRenderer( wall2, lightShader, lightObjRenderSetup, lightObjReneder );
-    wall2.color = vec4( 0, 1, 0, 1 );
+    wall2.color = brownCol;
     myScene.addObject( wall2 );
 
     var wall3 = new Quad( 10, 2, vec4(  0, 1, -5, 1), Quat.fromAxisAndAngle( vec3( -1, 0, 0 ), 90 ), vec3( 1, 1, 1 ) );
     wall3.meshRenderer = new MeshRenderer( wall3, lightShader, lightObjRenderSetup, lightObjReneder );
-    wall3.color = vec4( 0, 0, 1, 1 );
+    wall3.color = brownCol;
     myScene.addObject( wall3 );
 
     var yTurn = Quat.fromAxisAndAngle( vec3( 0, 1, 0 ), 90 );
     var zTurn = Quat.fromAxisAndAngle( vec3( 0, 0, 1 ), 90 );
     var wall4 = new Quad( 10, 2, vec4( -5, 1, 0, 1), Quat.mult( yTurn, zTurn ), vec3( 1, 1, 1 ) );
     wall4.meshRenderer = new MeshRenderer( wall4, lightShader, lightObjRenderSetup, lightObjReneder );
-    wall4.color = vec4( 0.8, 0.2, 1, 1 );
+    wall4.color = brownCol;
     myScene.addObject( wall4 );
 
 
-    var chair = new GameObject( "chair", vec4( 0, .45, -4, 1 ), Quat.identity, vec3( .02, .02, .02 ) );
+    var chair = new GameObject( "chair", vec4( 0, .5, -4, 1 ), Quat.identity, vec3( .02, .02, .02 ) );
     chair.mesh = new Mesh( getChairVertices(), getChairFaces() );
     chair.meshRenderer = new MeshRenderer( chair, lightShader, lightObjRenderSetup, lightObjReneder );
     chair.color = vec4( 0.8, 0.2, .4, 1 );
