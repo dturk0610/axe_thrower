@@ -78,7 +78,7 @@ function lightDirMatSetup(){
     var dirMaterial = new Material( shader );
 
     dirMaterial.lightDir = (new Vector3( 1, -1, 0 )).normalized;
-    dirMaterial.lightStrength = 0.75;
+    dirMaterial.lightStrength = 1.0;
 
     dirMaterial.renderSetup = dirRenderSetup;
     dirMaterial.render = dirRender;

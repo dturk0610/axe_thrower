@@ -104,9 +104,7 @@ function setupScene(){
 function drawScene( now ){
     now *= 0.001;
     if (pastTime === undefined){ pastTime = now; }
-
     var timeDelta = now - pastTime;
-
     var cam = myScene.camera;
 
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
