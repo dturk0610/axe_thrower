@@ -224,8 +224,12 @@ class Mesh{
 
 class Material{
 
-    constructor(){
-
+    /**
+     * 
+     * @param {*} shader 
+     */
+    constructor( shader ){
+        this.shader = shader;
     }
 
 }
