@@ -90,9 +90,12 @@ function setupScene(){
 
     var chair = new GameObject( "chair", new Vector4( 0, .45, -4, 1 ), Quat.identity, new Vector3( .02, .02, .02 ) );
     chair.mesh = new Mesh( getChairVertices(), getChairFaces() );
-    var chairMat = chairMatSetup();
-    chairMat.gameObject = chair;
-    chair.meshRenderer = new MeshRenderer( chair, chairMat );
+    // var chairMat = chairMatSetup();
+    // chairMat.gameObject = chair;
+    // chair.meshRenderer = new MeshRenderer( chair, chairMat );
+    var lightMaterial = lightDirMatSetup();
+    lightMaterial.gameObject = chair;
+    chair.meshRenderer = new MeshRenderer( chair, lightMaterial );
     chair.color = new Vector4( 0.8, 0.2, .4, 1 );
     myScene.addObject( chair );
 

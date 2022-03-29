@@ -165,7 +165,7 @@
     attribute vec4 vertexPosition;
     attribute vec3 nv;
     
-    uniform mat4 worldMat, worldMatInverse, projectMat;
+    uniform mat4 worldMat, worldMatInverse, projectMat, worldMatTransposeInverse;
     
     varying vec3 v_normal;
     
@@ -175,7 +175,9 @@
 
         gl_Position = projectMat * vertexPositionTransformed;
 
-        v_normal = nv;
+        vec4 tempNV = vec4( nv.x, nv.y, nv.z, 1.0 );
+        tempNV = worldMatTransposeInverse * tempNV;
+        v_normal = tempNV.xyz;
 
     }
 
@@ -189,6 +191,7 @@
     varying vec3 v_normal;
 
     uniform vec3 u_reverseLightDirection;
+    uniform float u_lightStrength;
     uniform vec4 u_color;
     
     void main() {
@@ -198,7 +201,7 @@
         float light = dot( normal, u_reverseLightDirection );
 
         gl_FragColor = u_color;
-        gl_FragColor *= light;
+        gl_FragColor.rgb *= light * u_lightStrength;
     }
 
 </script>
@@ -217,6 +220,7 @@
 <script type="text/javascript" src="../AxeThrower/Objects/chair.js"></script>
 <script type="text/javascript" src="../AxeThrower/Materials/chairMaterial.js"></script>
 <script type="text/javascript" src="../AxeThrower/Materials/floorMaterial.js"></script>
+<script type="text/javascript" src="../AxeThrower/Materials/testDirLightMat.js"></script>
 </head>
 
 <body onload = "init()">

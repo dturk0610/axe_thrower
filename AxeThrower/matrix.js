@@ -136,36 +136,32 @@ class Matrix{
           d * ((tmp_22 * m22 + tmp_16 * m02 + tmp_21 * m12) -
                 (tmp_20 * m12 + tmp_23 * m22 + tmp_17 * m02))
         ];
-      }
-
-    static matMult( m1, m2 ){
-        var result = [];
-        for (var i = 0; i < m1.length; i++) {
-            result[i] = [];
-            for (var j = 0; j < m2[0].length; j++) {
-                var sum = 0;
-                for (var k = 0; k < m1[0].length; k++) {
-                    sum += m1[i][k] * m2[k][j];
-                }
-                result[i][j] = sum;
-            }
-        }
-        return result;
     }
 
-    static matTranspose( m ){
-        
-        var result = [];
-        for ( var i = 0; i < m.length; ++i ) {
-            result.push( [] );
-            for ( var j = 0; j < m[i].length; ++j ) {
-                result[i].push( m[j][i] );
-            }
-        }
+    static transpose( m ){
 
-        result.matrix = true;
+        var m00 = m[0 * 4 + 0];
+        var m01 = m[0 * 4 + 1];
+        var m02 = m[0 * 4 + 2];
+        var m03 = m[0 * 4 + 3];
+        var m10 = m[1 * 4 + 0];
+        var m11 = m[1 * 4 + 1];
+        var m12 = m[1 * 4 + 2];
+        var m13 = m[1 * 4 + 3];
+        var m20 = m[2 * 4 + 0];
+        var m21 = m[2 * 4 + 1];
+        var m22 = m[2 * 4 + 2];
+        var m23 = m[2 * 4 + 3];
+        var m30 = m[3 * 4 + 0];
+        var m31 = m[3 * 4 + 1];
+        var m32 = m[3 * 4 + 2];
+        var m33 = m[3 * 4 + 3];
 
-        return result;
+        return [ m00, m10, m20, m30, 
+                m01, m11, m21, m31,
+                m02, m12, m22, m32,
+                m03, m13, m23, m33 
+        ];
     }
 
     /**
