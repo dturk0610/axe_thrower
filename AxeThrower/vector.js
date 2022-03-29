@@ -16,39 +16,74 @@ class Vector4{
         this.w = w;
     }
 
+    /**
+     * @returns an array of the x, y, z and w positions of this vector.
+     */
     get xyzw(){
         return [ this.x, this.y, this.z, this.w ];
     }
 
+    /**
+     * This version is to be used when the vector is being represented as a color.
+     * @returns an array of the x, y, z and w positions of this vector.
+     */
     get rgba(){
         return [ this.x, this.y, this.z, this.w ];
     }
 
+    /**
+     * @returns an array of the x, y and z positions of this vector.
+     */
     get xyz(){
         return [ this.x, this.y, this.z ];
     }
 
+    /**
+     * This version is to be used when the vector is being represented as a color.
+     * @returns an array of the x, y and z positions of this vector.
+     */
     get rgb(){
         return [ this.x, this.y, this.z ];
     }
 
+    /**
+     * @returns an array of the x and y positions of this vector.
+     */
     get xy(){
         return [ this.x, this.y ];
     }
 
+    /**
+     * @returns the x component of the vector, assumed to be represnting the r channel for collor
+     */
     get r(){
         return this.x;
     }
+
+    /**
+     * @returns the y component of the vector, assumed to be represnting the g channel for collor
+     */
     get g(){
         return this.y;
     }
+
+    /**
+     * @returns the z component of the vector, assumed to be represnting the b channel for collor
+     */
     get b(){
         return this.z;
     }
+
+    /**
+     * @returns the w component of the vector, assumed to be represnting the a channel for collor
+     */
     get a(){
         return this.w;
     }
 
+    /**
+     * @returns this vector normalized.
+     */
     get normalized(){
         var invMag = 1/Math.sqrt( this.x*this.x + this.y*this.y + this.z*this.z + this.w*this.w );
         return new Vector4( this.x*invMag, this.y*invMag, this.z*invMag, this.w*invMag );
@@ -74,6 +109,11 @@ class Vector4{
         return new Vector4( v.x + u.x, v.y + u.y, v.z + u.z, v.w + u.w );
     }
 
+    /**
+     * 
+     * @param {[Vector3]} varr array of vectors to flatten to the GPU.
+     * @returns 
+     */
     static Flatten( varr ){
         var ret = new Float32Array( varr.length * 4 );
         for (var i = 0; i < varr.length; i++){
@@ -108,18 +148,31 @@ class Vector3{
         this.z = z;
     }
 
+    /**
+     * @returns an array of the x, y and z positions of this vector.
+     */
     get xyz(){
         return [ this.x, this.y, this.z ];
     }
 
+    /**
+     * This version is to be used when the vector is being represented as a color.
+     * @returns an array of the x, y and z positions of this vector.
+     */
     get rgb(){
         return [ this.x, this.y, this.z ];
     }
 
+    /**
+     * @returns an array of the x and y positions of this vector.
+     */
     get xy(){
         return [ this.x, this.y ];
     }
 
+    /**
+     * @returns this vector normalized.
+     */
     get normalized(){
         var invMag = 1/Math.sqrt( this.x*this.x +  this.y*this.y +  this.z*this.z );
         return new Vector3( this.x*invMag, this.y*invMag, this.z*invMag );
@@ -145,6 +198,12 @@ class Vector3{
         return new Vector4( v.x + u.x, v.y + u.y, v.z + u.z );
     }
 
+    /**
+     * 
+     * @param {Vector3} v 
+     * @param {Vector3} u 
+     * @returns 
+     */
     static Cross( v, u ){
         var newX = v.y*u.z - v.z*u.y;
         var newY = v.z*u.x - v.x*u.z;
@@ -152,6 +211,11 @@ class Vector3{
         return new Vector3( newX, newY, newZ );
     }
 
+    /**
+     * 
+     * @param {[Vector3]} varr array of vectors to flatten to the GPU.
+     * @returns 
+     */
     static Flatten( varr ){
         var ret = new Float32Array( varr.length * 3 );
         for (var i = 0; i < varr.length; i++){
