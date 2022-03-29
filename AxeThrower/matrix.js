@@ -168,14 +168,26 @@ class Matrix{
         return result;
     }
 
+    /**
+    * 
+    * @param {Vector4} v 
+    * @param {matrix} m 
+    * @returns 
+    */
     static vecMatMult(v, m) {
-        var dst = [];
-        for (var i = 0; i < 4; ++i) {
-          dst[i] = 0.0;
-          for (var j = 0; j < 4; ++j) {
-            dst[i] += v[j] * m[j * 4 + i];
-          }
-        }
-        return dst;
+
+        var newX = v.x*m[0*4 + 0] + v.y*m[1*4 + 0] + v.z*m[2*4 + 0] + v.w*m[3*4 + 0];
+        var newY = v.x*m[0*4 + 1] + v.y*m[1*4 + 1] + v.z*m[2*4 + 1] + v.w*m[3*4 + 1];
+        var newZ = v.x*m[0*4 + 2] + v.y*m[1*4 + 2] + v.z*m[2*4 + 2] + v.w*m[3*4 + 2];
+        var newW = v.x*m[0*4 + 3] + v.y*m[1*4 + 3] + v.z*m[2*4 + 3] + v.w*m[3*4 + 3];
+        return new Vector4( newX, newY, newZ, newW );
+        // var dst = [];
+        // for (var i = 0; i < 4; ++i) {
+        //   dst[i] = 0.0;
+        //   for (var j = 0; j < 4; ++j) {
+        //     dst[i] += v[j] * m[j * 4 + i];
+        //   }
+        // }
+        // return dst;
     }
 }

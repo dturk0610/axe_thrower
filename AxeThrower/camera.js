@@ -2,13 +2,13 @@ class Camera{
 
     /**
      * 
-     * @param {vec3} position 
+     * @param {Vector4} position 
      * @param {number} aspect 
      * @param {number} nearPlane 
      * @param {number} farPlane 
      * @param {number} fov field of view in degrees
      */
-    constructor( position = vec4( 0.0, 0.0, 10.0, 1.0 ), rotation = new Quat( 0.0, 0.0, 0.0, 1.0 ), aspect = 1, nearPlane = .01, farPlane = 1000.0, fov = 30, left = -0.5, right = 0.5, top = 0.5, bottom = -0.5 ){
+    constructor( position = Vector4( 0.0, 0.0, 10.0, 1.0 ), rotation = new Quat( 0.0, 0.0, 0.0, 1.0 ), aspect = 1, nearPlane = .01, farPlane = 1000.0, fov = 30, left = -0.5, right = 0.5, top = 0.5, bottom = -0.5 ){
         this.transform = new Transform( position, rotation );
         this.aspect = aspect;
         this.nearPlane = nearPlane;
@@ -28,7 +28,7 @@ class Camera{
     // aspect = right/top
     // tanfovy = top/near -> invf = near/top
     // invf/aspect = (near/top)/(right/top) = near/right
-    constructPerspectiveMat = function(){
+    constructPerspectiveMat(){
         var invf = Math.tan( Math.PI * 0.5 - this.fov*0.5 ); // subtracting half our fov from pi/2 inverts tan(fov/2)
         var invRange = 1.0 / (this.nearPlane - this.farPlane); // the negatives that would be found in the
                                                                // perspective matrix gets absorbed into this
@@ -41,7 +41,7 @@ class Camera{
         ];
     }
 
-    constructOthoMat = function(){
+    constructOthoMat(){
         var invRminL = 1 / ( this.right - this.left );
         var invTminB = 1 / ( this.top - this.bottom );
         var invFminN = 1 / ( this.farPlane - this.nearPlane );
@@ -56,26 +56,26 @@ class Camera{
        ];
     }
 
-    calculateCameraMatrix = function(){
+    calculateCameraMatrix(){
         var rotMat = Quat.toMat4(this.transform.rotation);
         var translateMat = [
                                      1,                          0,                          0, 0,
                                      0,                          1,                          0, 0,
                                      0,                          0,                          1, 0,
-            this.transform.position[0], this.transform.position[1], this.transform.position[2], 1 
+             this.transform.position.x,  this.transform.position.y,  this.transform.position.z, 1 
         ];
         return Matrix.mult4x4( translateMat, rotMat );
     }
 
-    calculateViewMatrix = function(){
+    calculateViewMatrix(){
         return Matrix.inverseM4x4(this.cameraToWorldMatrix);
     }
 
     move( dir ){
         // we are ignoring the y direction so we don't fly away to space
         var moveAmount = .1;
-        this.transform.position[0] += dir[0] * moveAmount;
-        this.transform.position[2] += dir[2] * moveAmount;
+        this.transform.position.x += dir.x * moveAmount;
+        this.transform.position.z += dir.z * moveAmount;
         this.update();
     } 
 

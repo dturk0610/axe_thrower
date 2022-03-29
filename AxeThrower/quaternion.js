@@ -17,30 +17,30 @@ class Quat{
 
     /**
      * Rebuilds the current quaternion so that its new axis and angle are the ones entered
-     * @param {vec3} axis axis to rotate around
+     * @param {Vector3} axis axis to rotate around
      * @param {number} angle angle in degress to rotate around by
      */
     setWithAxisAndAngle( axis, angle ){
-        axis = normalize(axis); // makes sure that the axis is truly normalized
+        axis = axis.normalized; // makes sure that the axis is truly normalized
         angle = angle * Math.PI / 180.0;
-        this.x = axis[0] * Math.sin( angle/2 );
-        this.y = axis[1] * Math.sin( angle/2 );
-        this.z = axis[2] * Math.sin( angle/2 );
+        this.x = axis.x * Math.sin( angle/2 );
+        this.y = axis.y * Math.sin( angle/2 );
+        this.z = axis.z * Math.sin( angle/2 );
         this.w = Math.cos( angle/2 );
     }
 
     /**
      * 
-     * @param {vec3} axis axis to rotate around.
+     * @param {Vector3} axis axis to rotate around.
      * @param {number} angle angle in degress to rotate around by.
      * @returns new quaternion built from rotation axis and angle.
      */
     static fromAxisAndAngle( axis, angle ){
-        axis = normalize(axis); // makes sure that the axis is truly normalized
+        axis = axis.normalized; // makes sure that the axis is truly normalized
         angle = angle * Math.PI / 180.0;
-        var x = axis[0] * Math.sin( angle/2 );
-        var y = axis[1] * Math.sin( angle/2 );
-        var z = axis[2] * Math.sin( angle/2 );
+        var x = axis.x * Math.sin( angle/2 );
+        var y = axis.y * Math.sin( angle/2 );
+        var z = axis.z * Math.sin( angle/2 );
         var w = Math.cos( angle/2 );
         return new Quat( x, y, z, w );
     }

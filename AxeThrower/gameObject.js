@@ -20,12 +20,12 @@ class GameObject{
     /**
      * 
      * @param {string} tag 
-     * @param {vec4} position 
+     * @param {Vector4} position 
      * @param {Quat} rotation 
-     * @param {[vec3]} verts 
+     * @param {[Vector3]} verts 
      * @param {[int]} indices 
      */
-    constructor( tag = "new game object", position = vec4( 0, 0, 0, 1 ), rotation = new Quat( 0, 0, 0, 1 ), scale = vec3( 1, 1, 1 ) ){
+    constructor( tag = "new game object", position = new Vector4( 0, 0, 0, 1 ), rotation = new Quat( 0, 0, 0, 1 ), scale = new Vector3( 1, 1, 1 ) ){
         this.tag = tag;
         this.transform = new Transform( position, rotation, scale );
         this.worldMat = this.calcWorldMat();
@@ -54,18 +54,18 @@ class Quad{
      * 
      * @param {number} width the width of the plane
      * @param {number} depth the height of the plane
-     * @param {vec4} position 
+     * @param {Vector4} position 
      * @param {Quat} rotation 
      * @returns 
      */
-    constructor( width = 1, depth = 1, position = vec4( 0.0, 0.0, 0.0, 1.0 ), rotation = new Quat( 0.0, 0.0, 0.0, 1.0 ), scale = vec3( 1, 1, 1 ) ){
+    constructor( width = 1, depth = 1, position = new Vector4( 0.0, 0.0, 0.0, 1.0 ), rotation = new Quat( 0.0, 0.0, 0.0, 1.0 ), scale = new Vector3( 1, 1, 1 ) ){
         // While these verts are layed out in a row maner, they are still expressed in the matrix as a 
         // column
         var verts = [
-             vec4( -width * 0.5, 0.0, -depth * 0.5, 1.0 ),
-             vec4( -width * 0.5, 0.0,  depth * 0.5, 1.0 ),
-             vec4(  width * 0.5, 0.0,  depth * 0.5, 1.0 ),
-             vec4(  width * 0.5, 0.0, -depth * 0.5, 1.0 )
+            new Vector4( -width * 0.5, 0.0, -depth * 0.5, 1.0 ),
+            new Vector4( -width * 0.5, 0.0,  depth * 0.5, 1.0 ),
+            new Vector4(  width * 0.5, 0.0,  depth * 0.5, 1.0 ),
+            new Vector4(  width * 0.5, 0.0, -depth * 0.5, 1.0 )
         ];
         var indexList = [ 0, 1, 2,
                          0, 2, 3 ];
@@ -85,48 +85,46 @@ class Transform{
 
     /**
      * 
-     * @param {vec4} position 
+     * @param {Vector4} position 
      * @param {Quat} rotation 
-     * @param {vec4} fwdVec 
-     * @param {vec4} upVec 
-     * @param {vec4} rightVec 
+     * @param {Vector3} scale
      */
-    constructor( position = vec4( 0, 0, 0, 1 ), rotation = new Quat( 0, 0, 0, 1 ), scale = vec3( 1, 1, 1 ) ){
+    constructor( position = new Vector4( 0, 0, 0, 1 ), rotation = new Quat( 0, 0, 0, 1 ), scale = new Vector3( 1, 1, 1 ) ){
         this.position = position;
         this.rotation = rotation;
         this.scale = scale;
         if ( !Quat.isEqual(rotation, Quat.identity) ){
             var rotMat = Quat.toMat4(rotation);
-            this.rightVec = Matrix.vecMatMult( vec4( 1, 0, 0, 1 ), rotMat );
-            this.upVec = Matrix.vecMatMult( vec4( 0, 1, 0, 1 ), rotMat );
-            this.fwdVec = Matrix.vecMatMult( vec4( 0, 0, 1, 1 ), rotMat );
+            this.rightVec = Matrix.vecMatMult( new Vector4( 1, 0, 0, 1 ), rotMat ).toVector3();
+            this.upVec = Matrix.vecMatMult( new Vector4( 0, 1, 0, 1 ), rotMat ).toVector3();
+            this.fwdVec = Matrix.vecMatMult( new Vector4( 0, 0, 1, 1 ), rotMat ).toVector3();
         }else{
-            this.rightVec = vec3( 1, 0, 0 );
-            this.upVec = vec3( 0, 1, 0 );
-            this.fwdVec = vec3( 0, 0, 1 );
+            this.rightVec = new Vector3( 1, 0, 0 );
+            this.upVec = new Vector3( 0, 1, 0 );
+            this.fwdVec = new Vector3( 0, 0, 1 );
         }
     }
 
     updateRotation(){
         var rotMat = Quat.toMat4(this.rotation);
-        this.rightVec = Matrix.vecMatMult( vec4( 1, 0, 0, 1 ), rotMat );
-        this.upVec = Matrix.vecMatMult( vec4( 0, 1, 0, 1 ), rotMat );
-        this.fwdVec = Matrix.vecMatMult( vec4( 0, 0, 1, 1 ), rotMat );
+        this.rightVec = Matrix.vecMatMult( new Vector4( 1, 0, 0, 1 ), rotMat ).toVector3();
+        this.upVec = Matrix.vecMatMult( new Vector4( 0, 1, 0, 1 ), rotMat ).toVector3();
+        this.fwdVec = Matrix.vecMatMult( new Vector4( 0, 0, 1, 1 ), rotMat ).toVector3();
     }
 
     calcWorldMat(){
         var scaleMat = [ 
-                        this.scale[0],             0,             0, 0,
-                                    0, this.scale[1],             0, 0,
-                                    0,             0, this.scale[2], 0,
+                        this.scale.x,             0,             0, 0,
+                                    0, this.scale.y,             0, 0,
+                                    0,             0, this.scale.z, 0,
                                     0,             0,             0, 1
                         ];
         var rotMat = Quat.toMat4( this.rotation );
         var moveMat = [
-                         1.0,              0.0,              0.0, 0.0,
-                         0.0,              1.0,              0.0, 0.0,
-                         0.0,              0.0,              1.0, 0.0,
-            this.position[0], this.position[1], this.position[2], 1.0 
+                        1.0,             0.0,             0.0, 0.0,
+                        0.0,             1.0,             0.0, 0.0,
+                        0.0,             0.0,             1.0, 0.0,
+            this.position.x, this.position.y, this.position.z, 1.0 
         ];
         var scaleRotMat = Matrix.mult4x4( rotMat, scaleMat );
         return Matrix.mult4x4( moveMat, scaleRotMat );
@@ -139,6 +137,11 @@ class Transform{
  */
 class Mesh{
 
+    /**
+     * 
+     * @param {*} verts 
+     * @param {*} indices 
+     */
     constructor(  verts = [], indices = [] ){
         this.verts = verts;
         this.numVertices = verts.length;
@@ -176,14 +179,14 @@ class Mesh{
         var faceNormals=[];
         // Iterate through all the triangles (i.e., from 0 to numTriangles-1)
         for (var i = 0; i < numTriangles; i++) {
-            var p0 = vec3( vertices[indexList[3*i]][0], vertices[indexList[3*i]][1], vertices[indexList[3*i]][2] );
-            var p1 = vec3( vertices[indexList[3*i + 1]][0], vertices[indexList[3*i + 1]][1], vertices[indexList[3*i + 1]][2] );
-            var p2 = vec3( vertices[indexList[3*i + 2]][0], vertices[indexList[3*i + 2]][1], vertices[indexList[3*i + 2]][2] );
+            var p0 = new Vector3( vertices[indexList[3*i]].x, vertices[indexList[3*i]].y, vertices[indexList[3*i]].z );
+            var p1 = new Vector3( vertices[indexList[3*i + 1]].x, vertices[indexList[3*i + 1]].y, vertices[indexList[3*i + 1]].z );
+            var p2 = new Vector3( vertices[indexList[3*i + 2]].x, vertices[indexList[3*i + 2]].y, vertices[indexList[3*i + 2]].z );
 
-            var p1minusp0 = vec3( p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2] );
-            var p2minusp0 = vec3( p2[0] - p0[0], p2[1] - p0[1], p2[2] - p0[2] );
-            var faceNormal = cross( p1minusp0, p2minusp0 );
-            faceNormal = normalize( faceNormal );
+            var p1minusp0 = new Vector3( p1.x - p0.x, p1.y - p0.y, p1.z - p0.z );
+            var p2minusp0 = new Vector3( p2.x - p0.x, p2.y - p0.y, p2.z - p0.z );
+            var faceNormal = Vector3.Cross( p1minusp0, p2minusp0 );
+            faceNormal = faceNormal.normalized;
             faceNormals.push( faceNormal );
         }
         // return the array of face normals
@@ -201,16 +204,16 @@ class Mesh{
         var numTriangles = this.numTriangles;
         // Iterate through all the vertices
         for (var j = 0; j < numVertices; j++) {
-            var vertexNormal = vec3( 0, 0, 0 );
+            var vertexNormal = new Vector3( 0, 0, 0 );
             // Iterate through triangles
             for (var i = 0; i < numTriangles; i++) {
                 if ( indexList[3*i] == j | indexList[3*i + 1] == j | indexList[3*i + 2] == j ){
-                    vertexNormal[0] = vertexNormal[0] + faceNormals[i][0];
-                    vertexNormal[1] = vertexNormal[1] + faceNormals[i][1];
-                    vertexNormal[2] = vertexNormal[2] + faceNormals[i][2];
+                    vertexNormal.x = vertexNormal.x + faceNormals[i].x;
+                    vertexNormal.y = vertexNormal.y + faceNormals[i].y;
+                    vertexNormal.z = vertexNormal.z + faceNormals[i].z;
                 }
             }
-            vertexNormal = normalize( vertexNormal );
+            vertexNormal = vertexNormal.normalized;
             vertexNormals.push( vertexNormal );
         }
 
@@ -219,6 +222,17 @@ class Mesh{
     }
 }
 
+class Material{
+
+    constructor(){
+
+    }
+
+}
+
+/**
+ * This class is the neccesary 
+ */
 class MeshRenderer{
 
     static gl;
@@ -236,6 +250,4 @@ class MeshRenderer{
     render(){
         this.renderFunc();
     }
-
-
 }
