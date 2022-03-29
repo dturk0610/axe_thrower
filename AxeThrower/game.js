@@ -1,8 +1,4 @@
 var gl;
-var numVertices;
-var numTriangles;
-var orthographicIsOn;
-var myShaderProgram;
 
 // This code renders the teapot in orthographic and perspective projection with a single
 // point light source using Gouraud shading.
@@ -31,6 +27,7 @@ var myShaderProgram;
 
 var h, w, invh, invw;
 var myScene;
+var pastTime;
 
 var floorShader, lightShader;
 
@@ -39,7 +36,6 @@ function init(){
     
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
-
 
     h = parseFloat(canvas.height); invh = 1.0/h;
     w = parseFloat(canvas.width); invw = 1.0/w;
@@ -55,7 +51,7 @@ function init(){
 
     setupGL();
     setupScene();
-    drawScene();
+    requestAnimationFrame( drawScene );
 
 };
 
@@ -76,133 +72,6 @@ function setupScene(){
 
     var cam = new Camera( new Vector4( 0, 1, 0, 1 ), new Quat( 0, 0, 0, 1 ), aspect, .01, 4000, 60, -1*aspect, 1*aspect, 1, -1 );
     myScene = new Scene( cam );
-
-    var baseObjRenderSetup = function( shaderProgram, meshRenederer ){
-        meshRenederer.indexBuffer = gl.createBuffer();
-        meshRenederer.verticesBuffer = gl.createBuffer();
-        meshRenederer.vertexPosition = gl.getAttribLocation( shaderProgram, "vertexPosition");
-        meshRenederer.perspectiveProjectionMatricLocation = gl.getUniformLocation( shaderProgram, "viewProjectMat" );
-        meshRenederer.worldMatLocation = gl.getUniformLocation( shaderProgram, "worldMat" );
-        meshRenederer.colUniformLocation = gl.getUniformLocation( shaderProgram, "col" );
-    }
-
-    var baseObjReneder = function(){
-        gl.useProgram( this.shaderProgram );
-
-        var mesh = this.gameObject.mesh;
-        var numTriangles = mesh.numTriangles;
-        var verts = mesh.getVertices();
-        var indexList = mesh.getFaces();
-
-        gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer );
-        gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexList), gl.STATIC_DRAW );
-        gl.bindBuffer( gl.ARRAY_BUFFER, this.verticesBuffer );
-        gl.bufferData( gl.ARRAY_BUFFER, Vector4.Flatten(verts), gl.STATIC_DRAW );
-        gl.vertexAttribPointer( this.vertexPosition, 4, gl.FLOAT, false, 0, 0 );
-        gl.enableVertexAttribArray( this.vertexPosition );
-
-        var projectionMat = Scene.mainCam.projectionMat;
-        var viewMat = Scene.mainCam.viewMat;
-        var viewProjectMat = Matrix.mult4x4( projectionMat, viewMat );
-
-        gl.uniformMatrix4fv( this.perspectiveProjectionMatricLocation, false, viewProjectMat );
-        gl.uniformMatrix4fv( this.worldMatLocation, false, this.gameObject.worldMat );
-        
-        var color = this.gameObject.color;
-        gl.uniform4f( this.colUniformLocation, color.r, color.g, color.b, color.b );
-        gl.drawElements( gl.TRIANGLES, 3 * numTriangles, gl.UNSIGNED_SHORT, 0 )
-    }
-
-    var lightObjRenderSetup = function( shaderProgram, meshRenderer ){
-        meshRenderer.indexBuffer = gl.createBuffer();
-        meshRenderer.verticesBuffer = gl.createBuffer();
-        meshRenderer.vertexPosition = gl.getAttribLocation( shaderProgram, "vertexPosition");
-        meshRenderer.normalsBuffer = gl.createBuffer();
-        meshRenderer.vertexNormalPointer = gl.getAttribLocation( shaderProgram, "nv" )
-        meshRenderer.worldMatLocation = gl.getUniformLocation( shaderProgram, "worldMat" );
-        meshRenderer.worldMatInverseLocation = gl.getUniformLocation( shaderProgram, "worldMatInverse" );
-        meshRenderer.perspectiveProjectionMatricLocation = gl.getUniformLocation( shaderProgram, "projectMat" );
-        meshRenderer.p0loc = gl.getUniformLocation( shaderProgram, "p0" );
-        meshRenderer.Ialoc = gl.getUniformLocation( shaderProgram, "Ia" );
-        meshRenderer.Idloc = gl.getUniformLocation( shaderProgram, "Id" );
-        meshRenderer.Isloc = gl.getUniformLocation( shaderProgram, "Is" );
-        meshRenderer.abcDistloc = gl.getUniformLocation( shaderProgram, "abcDist" );
-        meshRenderer.kaloc = gl.getUniformLocation( shaderProgram, "ka" );
-        meshRenderer.kdloc = gl.getUniformLocation( shaderProgram, "kd" );
-        meshRenderer.ksloc = gl.getUniformLocation( shaderProgram, "ks" );
-        meshRenderer.alphaloc = gl.getUniformLocation( shaderProgram, "alpha" );
-        meshRenderer.colUniformLocation = gl.getUniformLocation( shaderProgram, "col" );
-    }
-
-    var lightObjReneder = function(){
-        gl.useProgram( this.shaderProgram );
-
-        var mesh = this.gameObject.mesh;
-        var numTriangles = mesh.numTriangles;
-        var verts = mesh.getVertices();
-        var indexList = mesh.getFaces();
-
-        gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer );
-        gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexList), gl.STATIC_DRAW );
-
-        gl.bindBuffer( gl.ARRAY_BUFFER, this.verticesBuffer );
-        gl.bufferData( gl.ARRAY_BUFFER, Vector4.Flatten(verts), gl.STATIC_DRAW );
-        
-        gl.vertexAttribPointer( this.vertexPosition, 4, gl.FLOAT, false, 0, 0 );
-        gl.enableVertexAttribArray( this.vertexPosition );
-
-        var vertexNormals = mesh.vertexNormals;
-        
-        gl.bindBuffer( gl.ARRAY_BUFFER, this.normalsBuffer );
-        gl.bufferData( gl.ARRAY_BUFFER, Vector3.Flatten( vertexNormals ), gl.STATIC_DRAW );
-
-        gl.vertexAttribPointer( this.vertexNormalPointer, 3, gl.FLOAT, false, 0, 0 );
-        gl.enableVertexAttribArray( this.vertexNormalPointer );
-
-        var cam = Scene.mainCam;
-        var projectionMat;
-        if (!cam.orthoOn){
-            projectionMat = cam.projectionMat;
-        }
-        else{
-            projectionMat = cam.orthoMat;
-        }
-
-
-        var viewMat = cam.viewMat;
-        var viewProjectMat = Matrix.mult4x4( projectionMat, viewMat );
-        var worldMat = this.gameObject.worldMat;
-        var worldMatInverse = Matrix.inverseM4x4( this.gameObject.worldMat );
-
-        gl.uniformMatrix4fv( this.worldMatLocation, false, worldMat );
-        gl.uniformMatrix4fv( this.worldMatInverseLocation, false, worldMatInverse );
-        gl.uniformMatrix4fv( this.perspectiveProjectionMatricLocation, false, viewProjectMat );
-        
-        var color = this.gameObject.color;
-        gl.uniform4f( this.colUniformLocation, color.r, color.g, color.b, color.a );
-        
-        
-        gl.uniform3f( this.kaloc, 0.5, 0.5, 0.5 );
-        gl.uniform3f( this.kdloc, 0.5, 0.5, 0.5 );
-        gl.uniform3f( this.ksloc, 1.0, 1.0, 1.0 );
-        
-        gl.uniform1f( this.alphaloc, 4.0 );
-        
-        var posX = cam.transform.position.x;
-        var posY = cam.transform.position.y*3;
-        var posZ = cam.transform.position.z;
-
-        gl.uniform3f( this.p0loc, posX, posY, posZ );
-        
-        gl.uniform3f( this.Ialoc, 2.0, 2.0, 2.0 );
-        gl.uniform3f( this.Idloc, 0.8, 0.8, 0.5 );
-        gl.uniform3f( this.Isloc, 0.8, 0.8, 0.8 );
-        gl.uniform3f( this.abcDistloc, .05, 0.0, 0.0 );
-        
-        gl.drawElements( gl.TRIANGLES, 3 * numTriangles, gl.UNSIGNED_SHORT, 0 );
-    }
-
-
 
     var brownCol = new Vector4( 66.0/256.0, 40.0/256.0, 14.0/256.0, 1.0 );
     var floor = new Quad( 10, 10, new Vector4( 0, 0, 0, 1), new Quat( 0, 0, 0, 1 ), new Vector3( 1, 1, 1 ) );
@@ -255,7 +124,11 @@ function setupScene(){
 
 }
 
-function drawScene(){
+function drawScene( now ){
+    now *= 0.001;
+    if (pastTime === undefined){ pastTime = now; }
+
+    var timeDelta = now - pastTime;
 
     var cam = myScene.camera;
 
@@ -267,6 +140,9 @@ function drawScene(){
         }        
     });
 
+    cam.update( timeDelta );
+
+    pastTime = now;
     requestAnimationFrame(drawScene);
 }
 
@@ -302,9 +178,8 @@ function mouseMove( canvas, event ){
 
         cam.transform.rotation = currRot;
 
-        cam.update();
+        //cam.update();
         mouseDownPos = new Vector2( x, y );
-        //drawScene();
     }
 }
 
@@ -335,7 +210,6 @@ function onKeyDown(event) {
     if ( totDir.x != 0 || totDir.y != 0 || totDir.z != 0 ){
         totDir = totDir.normalized;
         myScene.camera.move( totDir );
-        //drawScene();
     }
 }
 function onKeyUp(event) {

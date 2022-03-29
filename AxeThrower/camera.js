@@ -23,6 +23,7 @@ class Camera{
         this.cameraToWorldMatrix = this.calculateCameraMatrix();
         this.viewMat = this.calculateViewMatrix();
         this.orthoOn = false;
+        this.nextPos = new Vector4( this.transform.position.x, this.transform.position.y, this.transform.position.z, 1 );
     }
 
     // aspect = right/top
@@ -73,13 +74,18 @@ class Camera{
 
     move( dir ){
         // we are ignoring the y direction so we don't fly away to space
-        var moveAmount = 0.05;
-        this.transform.position.x += dir.x * moveAmount;
-        this.transform.position.z += dir.z * moveAmount;
-        this.update();
+        var moveAmount = 0.5;
+        var newX = this.transform.position.x + dir.x * moveAmount;
+        var newZ = this.transform.position.z + dir.z * moveAmount;
+        this.nextPos = new Vector4( newX, this.transform.position.y, newZ, 1 );
     } 
 
-    update(){
+    update( timeDelta ){
+        
+        var lerpSpeed = 5.0;
+        var lerpPos = Vector4.Lerp( this.transform.position, this.nextPos, timeDelta*lerpSpeed );
+        this.transform.position = lerpPos;
+
         this.cameraToWorldMatrix = this.calculateCameraMatrix();
         this.viewMat = this.calculateViewMatrix();
         this.transform.updateRotation();

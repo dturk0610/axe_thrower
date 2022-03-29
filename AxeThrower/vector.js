@@ -100,18 +100,49 @@ class Vector4{
     }
 
     /**
-     * 
+     * So far this is specifically used for positioning, so the w component should always be 1
      * @param {Vector4} v 
      * @param {Vector4} u 
      * @returns 
      */
     static Add( v, u ){
-        return new Vector4( v.x + u.x, v.y + u.y, v.z + u.z, v.w + u.w );
+        return new Vector4( v.x + u.x, v.y + u.y, v.z + u.z );
+    }
+
+    /**
+     * So far this is specifically used for positioning, so the w component should always be 1
+     * this + v
+     * @param {Vector4} v 
+     * @returns 
+     */
+    Add( v ){
+        return new Vector4( this.x + v.x, this.y + v.y, this.z + v.z );
+    }
+
+    /**
+     * So far this is specifically used for positioning, so the w component should always be 1
+     * v - u
+     * @param {Vector4} v 
+     * @param {Vector4} u 
+     * @returns 
+     */
+     static Sub( v, u ){
+        return new Vector4( v.x - u.x, v.y - u.y, v.z - u.z );
+    }
+
+    /**
+     * So far this is specifically used for positioning, so the w component should always be 1
+     * this - v
+     * @param {Vector4} v 
+     * @returns 
+     */
+     Sub( v ){
+        return new Vector4( this.x - v.x, this.y - v.y, this.z - v.z );
     }
 
     /**
      * 
-     * @param {[Vector3]} varr array of vectors to flatten to the GPU.
+     * @param {[Vector4]} varr array of vectors to flatten to the GPU.
      * @returns 
      */
     static Flatten( varr ){
@@ -126,7 +157,18 @@ class Vector4{
     }
 
     static Scale( amount, v ){
-        return new Vector4( v.x*amount, v.y*amount, v.z*amount, v.w*amount );
+        return new Vector4( v.x*amount, v.y*amount, v.z*amount );
+    }
+
+    /**
+     * Returns the linear interpolation between the two vectors
+     * https://docs.unity3d.com/ScriptReference/Vector3.Lerp.html
+     * @param {Vector3} v 
+     * @param {Vector3} u 
+     * @param {number} ratio
+     */
+     static Lerp( v, u, ratio ){
+        return v.Add( Vector4.Scale( ratio, u.Sub( v )) );
     }
 
     toVector3(){
@@ -194,8 +236,36 @@ class Vector3{
      * @param {Vector3} u 
      * @returns 
      */
-    static Add( v, u ){
-        return new Vector4( v.x + u.x, v.y + u.y, v.z + u.z );
+     static Add( v, u ){
+        return new Vector3( v.x + u.x, v.y + u.y, v.z + u.z );
+    }
+
+    /**
+     * this + v
+     * @param {Vector3} v 
+     * @returns 
+     */
+    Add( v ){
+        return new Vector3( this.x + v.x, this.y + v.y, this.z + v.z );
+    }
+
+    /**
+     * v - u
+     * @param {Vector3} v 
+     * @param {Vector3} u 
+     * @returns 
+     */
+     static Sub( v, u ){
+        return new Vector3( v.x - u.x, v.y - u.y, v.z - u.z );
+    }
+
+    /**
+     * this - v
+     * @param {Vector3} v 
+     * @returns 
+     */
+     Sub( v ){
+        return new Vector3( this.x - v.x, this.y - v.y, this.z - v.z );
     }
 
     /**
@@ -224,6 +294,17 @@ class Vector3{
             ret[i*3 + 2] = varr[i].z;
         }
         return ret;
+    }
+
+    /**
+     * Returns the linear interpolation between the two vectors
+     * https://docs.unity3d.com/ScriptReference/Vector3.Lerp.html
+     * @param {Vector3} v 
+     * @param {Vector3} u 
+     * @param {number} ratio
+     */
+    static Lerp( v, u, ratio ){
+        return v.Add( Vector4.Scale( ratio, u.Sub(v)) );
     }
 }
 
@@ -260,6 +341,6 @@ class Vector2{
      * @returns 
      */
     static Add( v, u ){
-        return new Vector4( v.x + u.x, v.y + u.y );
+        return new Vector3( v.x + u.x, v.y + u.y );
     }
 }
