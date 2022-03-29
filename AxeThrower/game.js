@@ -34,11 +34,12 @@ var myScene;
 
 var floorShader, lightShader;
 
-function initGL(){
+function init(){
     var canvas = document.getElementById( "gl-canvas" );
     
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
+
 
     h = parseFloat(canvas.height); invh = 1.0/h;
     w = parseFloat(canvas.width); invw = 1.0/w;
@@ -201,40 +202,54 @@ function setupScene(){
         gl.drawElements( gl.TRIANGLES, 3 * numTriangles, gl.UNSIGNED_SHORT, 0 );
     }
 
+
+
     var brownCol = new Vector4( 66.0/256.0, 40.0/256.0, 14.0/256.0, 1.0 );
-    var floor1 = new Quad( 10, 10, new Vector4( 0, 0, 0, 1), new Quat( 0, 0, 0, 1 ), new Vector3( 1, 1, 1 ) );
-    floor1.meshRenderer = new MeshRenderer( floor1, lightShader, lightObjRenderSetup, lightObjReneder );
-    floor1.color = Vector4.Scale( 1.2, brownCol );
-    myScene.addObject( floor1 );
+    var floor = new Quad( 10, 10, new Vector4( 0, 0, 0, 1), new Quat( 0, 0, 0, 1 ), new Vector3( 1, 1, 1 ) );
+    var floorMat = floorMatSetup();
+    floorMat.gameObject = floor;
+    floor.meshRenderer = new MeshRenderer( floor, floorMat );
+    floor.color = Vector4.Scale( 1.2, brownCol );
+    myScene.addObject( floor );
 
     var wall1 = new Quad( 10, 2, new Vector4(  0, 1, 5, 1), Quat.fromAxisAndAngle( new Vector3( 1, 0, 0 ), 90 ), new Vector3( 1, 1, 1 ) );
-    wall1.meshRenderer = new MeshRenderer( wall1, lightShader, lightObjRenderSetup, lightObjReneder );
+    var floorMat = floorMatSetup();
+    floorMat.gameObject = wall1;
+    wall1.meshRenderer = new MeshRenderer( wall1, floorMat );
     wall1.color = brownCol;
     myScene.addObject( wall1 );
 
     var yTurn = Quat.fromAxisAndAngle( new Vector3( 0, 1, 0 ), 90 );
     var zTurn = Quat.fromAxisAndAngle( new Vector3( 0, 0, -1 ), 90 );
-    var wall2 = new Quad( 10, 2, new Vector4(  5, 1, 0, 1), Quat.mult( yTurn, zTurn ), new Vector3( 1, 1, 1 ) );
-    wall2.meshRenderer = new MeshRenderer( wall2, lightShader, lightObjRenderSetup, lightObjReneder );
+    var wall2 = new Quad( 10, 2, new Vector4(  5, 1, 0, 1), Quat.mult( yTurn, zTurn ), new Vector3( 1, 1, 1 ) ); 
+    var floorMat = floorMatSetup();
+    floorMat.gameObject = wall2;
+    wall2.meshRenderer = new MeshRenderer( wall2, floorMat );
     wall2.color = brownCol;
     myScene.addObject( wall2 );
 
     var wall3 = new Quad( 10, 2, new Vector4(  0, 1, -5, 1), Quat.fromAxisAndAngle( new Vector3( -1, 0, 0 ), 90 ), new Vector3( 1, 1, 1 ) );
-    wall3.meshRenderer = new MeshRenderer( wall3, lightShader, lightObjRenderSetup, lightObjReneder );
+    var floorMat = floorMatSetup();
+    floorMat.gameObject = wall3;
+    wall3.meshRenderer = new MeshRenderer( wall3, floorMat );
     wall3.color = brownCol;
     myScene.addObject( wall3 );
 
     var yTurn = Quat.fromAxisAndAngle( new Vector3( 0, 1, 0 ), 90 );
     var zTurn = Quat.fromAxisAndAngle( new Vector3( 0, 0, 1 ), 90 );
     var wall4 = new Quad( 10, 2, new Vector4( -5, 1, 0, 1), Quat.mult( yTurn, zTurn ), new Vector3( 1, 1, 1 ) );
-    wall4.meshRenderer = new MeshRenderer( wall4, lightShader, lightObjRenderSetup, lightObjReneder );
+    var floorMat = floorMatSetup();
+    floorMat.gameObject = wall4;
+    wall4.meshRenderer = new MeshRenderer( wall4, floorMat );
     wall4.color = brownCol;
     myScene.addObject( wall4 );
 
 
     var chair = new GameObject( "chair", new Vector4( 0, .45, -4, 1 ), Quat.identity, new Vector3( .02, .02, .02 ) );
     chair.mesh = new Mesh( getChairVertices(), getChairFaces() );
-    chair.meshRenderer = new MeshRenderer( chair, lightShader, lightObjRenderSetup, lightObjReneder );
+    var chairMat = chairMatSetup();
+    chairMat.gameObject = chair;
+    chair.meshRenderer = new MeshRenderer( chair, chairMat );
     chair.color = new Vector4( 0.8, 0.2, .4, 1 );
     myScene.addObject( chair );
 

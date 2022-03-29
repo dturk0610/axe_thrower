@@ -73,7 +73,7 @@ class Camera{
 
     move( dir ){
         // we are ignoring the y direction so we don't fly away to space
-        var moveAmount = .1;
+        var moveAmount = 0.05;
         this.transform.position.x += dir.x * moveAmount;
         this.transform.position.z += dir.z * moveAmount;
         this.update();

@@ -229,7 +229,7 @@ class Material{
      * @param {*} shader 
      */
     constructor( shader ){
-        this.shader = shader;
+        this.shaderProgram = shader;
     }
 
 }
@@ -243,12 +243,14 @@ class MeshRenderer{
 
     static setGL ( gl ) { MeshRenderer.gl = gl; };
 
-    constructor( gameObj, shaderProgram, setupFunc, renderFunc ){
+    constructor( gameObj, material ){
         this.gameObject = gameObj;
-        this.shaderProgram = shaderProgram;
-        this.renderFunc = renderFunc;
+        this.material = material;
+        this.shaderProgram = this.material.shaderProgram;
+        this.setupFunc = this.material.renderSetup;
+        this.renderFunc = this.material.render;
         this.gl = MeshRenderer.gl;
-        setupFunc( shaderProgram, this );
+        this.setupFunc();
     }
 
     render(){
