@@ -181,13 +181,6 @@ class Matrix{
         var newZ = v.x*m[0*4 + 2] + v.y*m[1*4 + 2] + v.z*m[2*4 + 2] + v.w*m[3*4 + 2];
         var newW = v.x*m[0*4 + 3] + v.y*m[1*4 + 3] + v.z*m[2*4 + 3] + v.w*m[3*4 + 3];
         return new Vector4( newX, newY, newZ, newW );
-        // var dst = [];
-        // for (var i = 0; i < 4; ++i) {
-        //   dst[i] = 0.0;
-        //   for (var j = 0; j < 4; ++j) {
-        //     dst[i] += v[j] * m[j * 4 + i];
-        //   }
-        // }
-        // return dst;
+        
     }
 }

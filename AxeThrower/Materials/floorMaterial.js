@@ -99,7 +99,7 @@ function floorMatSetup(){
     floorMaterial.kd = new Vector3( 0.5, 0.5, 0.5 );
     floorMaterial.ks = new Vector3( 1.0, 1.0, 1.0 );
     floorMaterial.alpha = 4.0;
-    floorMaterial.Ia = new Vector3( 2.0, 2.0, 2.0 );
+    floorMaterial.Ia = new Vector3( 3.0, 3.0, 3.0 );
     floorMaterial.Id = new Vector3( 0.8, 0.8, 0.5 );
     floorMaterial.Is = new Vector3( 0.8, 0.8, 0.8 );
     floorMaterial.abcDist = new Vector3( .05, 0.0, 0.0 );

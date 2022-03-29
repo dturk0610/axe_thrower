@@ -1,30 +1,4 @@
 var gl;
-
-// This code renders the teapot in orthographic and perspective projection with a single
-// point light source using Gouraud shading.
-//
-// You can use this code as a starting point for lab 4.
-// The teapot sits in a bounding box that ranges between -20 and 20 in x, y, and z.
-// The curvy chair in Lab4Simpler sits in a bounding box that ranges between -40 and 40 in x, y, and z,
-// which means that you would have to scale up the coordinates of the eye (i.e. the camera
-// location), the projection matrices, and light location by 2.
-// The unknown object in Lab4 sits in an unknown bounding box, but an idea is to try a variety of
-// scale factors from this starting point.
-//
-// If you use the point light source here, you must add a second light source (either directional
-// or spotlight). You can also just use a directional and spotlight and circumvent the point
-// light if you wish, in accordance with the Lab4 requirements.
-//
-// Your code must also switch off and on the two lights independently, and switch off and on
-// the specular component, so you need to have flags for all these switches.
-//
-// Note: since the distances are large, the squared distance falls of quite quickly, which means
-// the point light or spot light may not show a visible result. The easiest solution to this
-// is to use the lighting calculation improvements section in the notes and scale the squared
-// distance with a constant value. The vertex shader illustrates this.
-//
-
-
 var h, w, invh, invw;
 var myScene;
 var pastTime;

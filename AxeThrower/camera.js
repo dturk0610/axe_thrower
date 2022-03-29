@@ -42,6 +42,10 @@ class Camera{
         ];
     }
 
+    /**
+     * 
+     * @returns the orthographic projection matrix to be used for when switching between ortrographic and perspective
+     */
     constructOthoMat(){
         var invRminL = 1 / ( this.right - this.left );
         var invTminB = 1 / ( this.top - this.bottom );
