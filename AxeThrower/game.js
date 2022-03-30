@@ -47,6 +47,11 @@ function setupScene(){
     var cam = new Camera( new Vector4( 0, 1, 0, 1 ), new Quat( 0, 0, 0, 1 ), aspect, .01, 4000, 60, -1*aspect, 1*aspect, 1, -1 );
     myScene = new Scene( cam );
 
+    var dirLight1 = new DirectionalLight( new Vector3( 1, -1, 0 ), 1.0 );
+    Scene.AddDirLight( dirLight1 );
+    //var dirLight2 = new DirectionalLight( new Vector3( 0, 0, -1 ), 1.0 );
+    //Scene.AddDirLight( dirLight2 );
+
     var brownCol = new Vector4( 66.0/256.0, 40.0/256.0, 14.0/256.0, 1.0 );
     var floor = new Quad( 10, 10, new Vector4( 0, 0, 0, 1), new Quat( 0, 0, 0, 1 ), new Vector3( 1, 1, 1 ) );
     var floorMat = floorMatSetup();

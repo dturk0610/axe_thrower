@@ -190,18 +190,28 @@
     
     varying vec3 v_normal;
 
-    uniform vec3 u_reverseLightDirection;
-    uniform float u_lightStrength;
+    struct DirectionalLight{
+        vec3 u_reverseLightDirection;
+        float u_lightStrength;
+    };
+
+    uniform DirectionalLight dirLights[5];
+    uniform int gNumDirLight;
+
     uniform vec4 u_color;
     
     void main() {
 
         vec3 normal = normalize(v_normal);
+        float light = 0.0;
 
-        float light = dot( normal, u_reverseLightDirection );
+        for ( int i = 0; i < 15; i++ ){
+            if ( i >= gNumDirLight ) break;
+            light += dot( normal, dirLights[i].u_reverseLightDirection ) * dirLights[i].u_lightStrength;
+        }
 
         gl_FragColor = u_color;
-        gl_FragColor.rgb *= light * u_lightStrength;
+        gl_FragColor.rgb *= light;
     }
 
 </script>
@@ -217,6 +227,7 @@
 <script type="text/javascript" src="quaternion.js"></script>
 <script type="text/javascript" src="matrix.js"></script>
 <script type="text/javascript" src="game.js"></script>
+<script type="text/javascript" src="lights.js"></script>
 <script type="text/javascript" src="../AxeThrower/Objects/chair.js"></script>
 <script type="text/javascript" src="../AxeThrower/Materials/chairMaterial.js"></script>
 <script type="text/javascript" src="../AxeThrower/Materials/floorMaterial.js"></script>
