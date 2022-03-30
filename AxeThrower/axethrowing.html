@@ -205,9 +205,10 @@
         vec3 normal = normalize(v_normal);
         float light = 0.0;
 
-        for ( int i = 0; i < 15; i++ ){
+        for ( int i = 0; i < 5; i++ ){
             if ( i >= gNumDirLight ) break;
-            light += dot( normal, dirLights[i].u_reverseLightDirection ) * dirLights[i].u_lightStrength;
+            float amount = dot( normal, dirLights[i].u_reverseLightDirection ) * dirLights[i].u_lightStrength;
+            if ( amount > 0.0 ) light += amount; 
         }
 
         gl_FragColor = u_color;

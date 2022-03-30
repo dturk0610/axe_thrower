@@ -170,6 +170,16 @@ class Vector4{
      static Lerp( v, u, ratio ){
         return v.Add( Vector4.Scale( ratio, u.Sub( v )) );
     }
+    
+    /**
+     * 
+     * @param {Vector4} v1 
+     * @param {Vector4} v2 
+     * @returns 
+     */
+     static isEqual( v1, v2 ){
+        return ( v1.x == v2.x && v1.y == v2.y && v1.z == v2.z && v1.w == v2.w );
+    }
 
     toVector3(){
         return new Vector3( this.x, this.y, this.z );
@@ -306,6 +316,18 @@ class Vector3{
     static Lerp( v, u, ratio ){
         return v.Add( Vector4.Scale( ratio, u.Sub(v)) );
     }
+
+    /**
+     * 
+     * @param {Vector3} v1 
+     * @param {Vector3} v2 
+     * @returns 
+     */
+    static isEqual( v1, v2 ){
+        return ( v1.x == v2.x && v1.y == v2.y && v1.z == v2.z );
+    }
+
+    static zero = new Vector3( 0, 0, 0 );
 }
 
 class Vector2{
