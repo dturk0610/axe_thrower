@@ -6,6 +6,8 @@ dirRenderSetup = function(){
     this.vertexPosition = gl.getAttribLocation( this.shaderProgram, "vertexPosition");
     this.normalsBuffer = gl.createBuffer();
     this.vertexNormalPointer = gl.getAttribLocation( this.shaderProgram, "nv" )
+    this.viewPosLoc = gl.getUniformLocation( this.shaderProgram, "viewPos" );
+
     this.worldMatLocation = gl.getUniformLocation( this.shaderProgram, "worldMat" );
     this.worldMatInverseLocation = gl.getUniformLocation( this.shaderProgram, "worldMatInverse" );
     this.worldMatTransposeInverseLocation = gl.getUniformLocation( this.shaderProgram, "worldMatTransposeInverse" );
@@ -15,18 +17,43 @@ dirRenderSetup = function(){
 // #region DIRECTIONAL LIGHT LOCATIONS
 
     this.gNumDirLightLoc = gl.getUniformLocation( this.shaderProgram, "gNumDirLight" );
-    this.reverseLightDir0Location = gl.getUniformLocation( this.shaderProgram, "dirLights[0].lightDirection" );
-    this.lightStrength0Location = gl.getUniformLocation( this.shaderProgram, "dirLights[0].lightStrength" );
-    this.reverseLightDir1Location = gl.getUniformLocation( this.shaderProgram, "dirLights[1].lightDirection" );
-    this.lightStrength1Location = gl.getUniformLocation( this.shaderProgram, "dirLights[1].lightStrength" );
-    this.reverseLightDir2Location = gl.getUniformLocation( this.shaderProgram, "dirLights[2].lightDirection" );
-    this.lightStrength2Location = gl.getUniformLocation( this.shaderProgram, "dirLights[2].lightStrength" );
-    this.reverseLightDir3Location = gl.getUniformLocation( this.shaderProgram, "dirLights[3].lightDirection" );
-    this.lightStrength3Location = gl.getUniformLocation( this.shaderProgram, "dirLights[3].lightStrength" );
-    this.reverseLightDir4Location = gl.getUniformLocation( this.shaderProgram, "dirLights[4].lightDirection" );
-    this.lightStrength4Location = gl.getUniformLocation( this.shaderProgram, "dirLights[4].lightStrength" );
     
+    this.lightDir0Location = gl.getUniformLocation( this.shaderProgram, "dirLights[0].lightDirection" );
+    this.dirLight0BaseAmbientLoc = gl.getUniformLocation( this.shaderProgram, "dirLights[0].base.ambient" );
+    this.dirLight0BaseDiffuseLoc = gl.getUniformLocation( this.shaderProgram, "dirLights[0].base.diffuse" );
+    this.dirLight0BaseSpecLoc = gl.getUniformLocation( this.shaderProgram, "dirLights[0].base.specular" );
+
+    this.lightDir1Location = gl.getUniformLocation( this.shaderProgram, "dirLights[1].lightDirection" );
+    this.dirLight1BaseAmbientLoc = gl.getUniformLocation( this.shaderProgram, "dirLights[1].base.ambient" );
+    this.dirLight1BaseDiffuseLoc = gl.getUniformLocation( this.shaderProgram, "dirLights[1].base.diffuse" );
+    this.dirLight1BaseSpecLoc = gl.getUniformLocation( this.shaderProgram, "dirLights[1].base.specular" );
+
+    this.lightDir2Location = gl.getUniformLocation( this.shaderProgram, "dirLights[2].lightDirection" );
+    this.dirLight2BaseAmbientLoc = gl.getUniformLocation( this.shaderProgram, "dirLights[2].base.ambient" );
+    this.dirLight2BaseDiffuseLoc = gl.getUniformLocation( this.shaderProgram, "dirLights[2].base.diffuse" );
+    this.dirLight2BaseSpecLoc = gl.getUniformLocation( this.shaderProgram, "dirLights[2].base.specular" );
+
+    this.lightDir3Location = gl.getUniformLocation( this.shaderProgram, "dirLights[3].lightDirection" );
+    this.dirLight3BaseAmbientLoc = gl.getUniformLocation( this.shaderProgram, "dirLights[3].base.ambient" );
+    this.dirLight3BaseDiffuseLoc = gl.getUniformLocation( this.shaderProgram, "dirLights[3].base.diffuse" );
+    this.dirLight3BaseSpecLoc = gl.getUniformLocation( this.shaderProgram, "dirLights[3].base.specular" );
+
+    this.lightDir4Location = gl.getUniformLocation( this.shaderProgram, "dirLights[4].lightDirection" );
+    this.dirLight4BaseAmbientLoc = gl.getUniformLocation( this.shaderProgram, "dirLights[4].base.ambient" );
+    this.dirLight4BaseDiffuseLoc = gl.getUniformLocation( this.shaderProgram, "dirLights[4].base.diffuse" );
+    this.dirLight4BaseSpecLoc = gl.getUniformLocation( this.shaderProgram, "dirLights[4].base.specular" );
+
 // #endregion
+
+// #region MATERIAL LOCATIONS
+
+    this.materialAmbientLoc = gl.getUniformLocation( this.shaderProgram, "material.ambient" );
+    this.materialDiffuseLoc = gl.getUniformLocation( this.shaderProgram, "material.diffuse" );
+    this.materialSpecLoc = gl.getUniformLocation( this.shaderProgram, "material.specular" );
+    this.materialShineLoc = gl.getUniformLocation( this.shaderProgram, "material.shininess" );
+
+// #endregion
+
 
 }
 
@@ -71,6 +98,7 @@ dirRender = function(){
     var worldMatInverse = Matrix.inverseM4x4( this.gameObject.worldMat );
     var worldMatTransposeInverse = Matrix.transpose( worldMatInverse );
 
+    gl.uniform3fv( this.viewPosLoc, cam.transform.position.xyz );
     gl.uniformMatrix4fv( this.worldMatLocation, false, worldMat );
     gl.uniformMatrix4fv( this.worldMatTransposeInverseLocation, false, worldMatTransposeInverse );
     gl.uniformMatrix4fv( this.worldMatInverseLocation, false, worldMatInverse );
@@ -89,30 +117,44 @@ dirRender = function(){
     switch( numDirLightsInScene ){
         case 5: 
             var currLight = dirLightsInScene[4];
-            gl.uniform3fv( this.reverseLightDir4Location, currLight.direction.xyz );
-            gl.uniform1f( this.lightStrength4Location, currLight.strength );
+            gl.uniform3fv( this.lightDir4Location, currLight.direction.xyz );
+            gl.uniform3fv( this.dirLight4BaseAmbientLoc, currLight.base.ambient.rgb );
+            gl.uniform3fv( this.dirLight4BaseDiffuseLoc, currLight.base.diffuse.rgb );
+            gl.uniform3fv( this.dirLight4BaseSpecLoc, currLight.base.specular.rgb );
         case 4:
             var currLight = dirLightsInScene[3];
-            gl.uniform3fv( this.reverseLightDir3Location, currLight.direction.xyz );
-            gl.uniform1f( this.lightStrength3Location, currLight.strength );
+            gl.uniform3fv( this.lightDir3Location, currLight.direction.xyz );
+            gl.uniform3fv( this.dirLight3BaseAmbientLoc, currLight.base.ambient.rgb );
+            gl.uniform3fv( this.dirLight3BaseDiffuseLoc, currLight.base.diffuse.rgb );
+            gl.uniform3fv( this.dirLight3BaseSpecLoc, currLight.base.specular.rgb );
         case 3:
             var currLight = dirLightsInScene[2];
-            gl.uniform3fv( this.reverseLightDir2Location, currLight.direction.xyz );
-            gl.uniform1f( this.lightStrength2Location, currLight.strength );
+            gl.uniform3fv( this.lightDir2Location, currLight.direction.xyz );
+            gl.uniform3fv( this.dirLight2BaseAmbientLoc, currLight.base.ambient.rgb );
+            gl.uniform3fv( this.dirLight2BaseDiffuseLoc, currLight.base.diffuse.rgb );
+            gl.uniform3fv( this.dirLight2BaseSpecLoc, currLight.base.specular.rgb );
         case 2:
             var currLight = dirLightsInScene[1];
-            gl.uniform3fv( this.reverseLightDir1Location, currLight.direction.xyz );
-            gl.uniform1f( this.lightStrength1Location, currLight.strength );
+            gl.uniform3fv( this.lightDir1Location, currLight.direction.xyz );
+            gl.uniform3fv( this.dirLight1BaseAmbientLoc, currLight.base.ambient.rgb );
+            gl.uniform3fv( this.dirLight1BaseDiffuseLoc, currLight.base.diffuse.rgb );
+            gl.uniform3fv( this.dirLight1BaseSpecLoc, currLight.base.specular.rgb );
         case 1:
             var currLight = dirLightsInScene[0];
-            gl.uniform3fv( this.reverseLightDir0Location, currLight.direction.xyz );
-            gl.uniform1f( this.lightStrength0Location, currLight.strength );
+            gl.uniform3fv( this.lightDir0Location, currLight.direction.xyz );
+            gl.uniform3fv( this.dirLight0BaseAmbientLoc, currLight.base.ambient.rgb );
+            gl.uniform3fv( this.dirLight0BaseDiffuseLoc, currLight.base.diffuse.rgb );
+            gl.uniform3fv( this.dirLight0BaseSpecLoc, currLight.base.specular.rgb );
         default: break;
     }
 
 // #endregion
 
-
+    var material = this.material;
+    gl.uniform3fv( this.materialAmbientLoc, material.ambient.rgb );
+    gl.uniform3fv( this.materialDiffuseLoc, material.diffuse.rgb );
+    gl.uniform3fv( this.materialSpecLoc, material.specular.rgb );
+    gl.uniform1f( this.materialShineLoc, material.shininess );
 
 
     gl.drawElements( gl.TRIANGLES, 3 * numTriangles, gl.UNSIGNED_SHORT, 0 );
@@ -122,6 +164,11 @@ function lightDirMatSetup(){
     var shader = initShaders( gl, "vertex-lighting", "fragment-lighting" );
 
     var dirMaterial = new Material( shader );
+
+    dirMaterial.ambient = new Vector3( 1.0, 0.5, 0.31 );
+    dirMaterial.diffuse = new Vector3( 1.0, 0.5, 0.31 );
+    dirMaterial.specular = new Vector3( 0.5, 0.5, 0.5 );
+    dirMaterial.shininess = 10.0;
 
     //dirMaterial.lightDir = (new Vector3( 1, -1, 0 )).normalized;
     //dirMaterial.lightStrength = 1.0;
