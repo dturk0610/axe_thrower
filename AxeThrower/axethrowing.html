@@ -191,12 +191,16 @@
     varying vec3 v_normal;
 
     struct DirectionalLight{
-        vec3 u_reverseLightDirection;
-        float u_lightStrength;
+        vec3 lightDirection;
+        float lightStrength;
     };
 
     uniform DirectionalLight dirLights[5];
     uniform int gNumDirLight;
+
+    struct PointLight{
+        vec4 pos;
+    };
 
     uniform vec4 u_color;
     
@@ -207,7 +211,7 @@
 
         for ( int i = 0; i < 5; i++ ){
             if ( i >= gNumDirLight ) break;
-            float amount = dot( normal, dirLights[i].u_reverseLightDirection ) * dirLights[i].u_lightStrength;
+            float amount = dot( normal, -dirLights[i].lightDirection ) * dirLights[i].lightStrength;
             if ( amount > 0.0 ) light += amount; 
         }
 

@@ -11,19 +11,23 @@ dirRenderSetup = function(){
     this.worldMatTransposeInverseLocation = gl.getUniformLocation( this.shaderProgram, "worldMatTransposeInverse" );
     this.perspectiveProjectionMatricLocation = gl.getUniformLocation( this.shaderProgram, "projectMat" );
     this.colUniformLocation = gl.getUniformLocation( this.shaderProgram, "u_color" );
-    
+
+// #region DIRECTIONAL LIGHT LOCATIONS
+
     this.gNumDirLightLoc = gl.getUniformLocation( this.shaderProgram, "gNumDirLight" );
-    this.reverseLightDir0Location = gl.getUniformLocation( this.shaderProgram, "dirLights[0].u_reverseLightDirection" );
-    this.lightStrength0Location = gl.getUniformLocation( this.shaderProgram, "dirLights[0].u_lightStrength" );
-    this.reverseLightDir1Location = gl.getUniformLocation( this.shaderProgram, "dirLights[1].u_reverseLightDirection" );
-    this.lightStrength1Location = gl.getUniformLocation( this.shaderProgram, "dirLights[1].u_lightStrength" );
-    this.reverseLightDir2Location = gl.getUniformLocation( this.shaderProgram, "dirLights[2].u_reverseLightDirection" );
-    this.lightStrength2Location = gl.getUniformLocation( this.shaderProgram, "dirLights[2].u_lightStrength" );
-    this.reverseLightDir3Location = gl.getUniformLocation( this.shaderProgram, "dirLights[3].u_reverseLightDirection" );
-    this.lightStrength3Location = gl.getUniformLocation( this.shaderProgram, "dirLights[3].u_lightStrength" );
-    this.reverseLightDir4Location = gl.getUniformLocation( this.shaderProgram, "dirLights[4].u_reverseLightDirection" );
-    this.lightStrength4Location = gl.getUniformLocation( this.shaderProgram, "dirLights[4].u_lightStrength" );
+    this.reverseLightDir0Location = gl.getUniformLocation( this.shaderProgram, "dirLights[0].lightDirection" );
+    this.lightStrength0Location = gl.getUniformLocation( this.shaderProgram, "dirLights[0].lightStrength" );
+    this.reverseLightDir1Location = gl.getUniformLocation( this.shaderProgram, "dirLights[1].lightDirection" );
+    this.lightStrength1Location = gl.getUniformLocation( this.shaderProgram, "dirLights[1].lightStrength" );
+    this.reverseLightDir2Location = gl.getUniformLocation( this.shaderProgram, "dirLights[2].lightDirection" );
+    this.lightStrength2Location = gl.getUniformLocation( this.shaderProgram, "dirLights[2].lightStrength" );
+    this.reverseLightDir3Location = gl.getUniformLocation( this.shaderProgram, "dirLights[3].lightDirection" );
+    this.lightStrength3Location = gl.getUniformLocation( this.shaderProgram, "dirLights[3].lightStrength" );
+    this.reverseLightDir4Location = gl.getUniformLocation( this.shaderProgram, "dirLights[4].lightDirection" );
+    this.lightStrength4Location = gl.getUniformLocation( this.shaderProgram, "dirLights[4].lightStrength" );
     
+// #endregion
+
 }
 
 dirRender = function(){
@@ -78,30 +82,35 @@ dirRender = function(){
 
     var dirLightsInScene = Scene.GetDirLights();
     var numDirLightsInScene = dirLightsInScene.length;
+
+// #region DIRECTIONAL LIGHT SETTINGS
+
     gl.uniform1i( this.gNumDirLightLoc, numDirLightsInScene );
     switch( numDirLightsInScene ){
         case 5: 
             var currLight = dirLightsInScene[4];
-            gl.uniform3f( this.reverseLightDir4Location, -currLight.direction.x, -currLight.direction.y, -currLight.direction.z );
+            gl.uniform3fv( this.reverseLightDir4Location, currLight.direction.xyz );
             gl.uniform1f( this.lightStrength4Location, currLight.strength );
         case 4:
             var currLight = dirLightsInScene[3];
-            gl.uniform3f( this.reverseLightDir3Location, -currLight.direction.x, -currLight.direction.y, -currLight.direction.z );
+            gl.uniform3fv( this.reverseLightDir3Location, currLight.direction.xyz );
             gl.uniform1f( this.lightStrength3Location, currLight.strength );
         case 3:
             var currLight = dirLightsInScene[2];
-            gl.uniform3f( this.reverseLightDir2Location, -currLight.direction.x, -currLight.direction.y, -currLight.direction.z );
+            gl.uniform3fv( this.reverseLightDir2Location, currLight.direction.xyz );
             gl.uniform1f( this.lightStrength2Location, currLight.strength );
         case 2:
             var currLight = dirLightsInScene[1];
-            gl.uniform3f( this.reverseLightDir1Location, -currLight.direction.x, -currLight.direction.y, -currLight.direction.z );
+            gl.uniform3fv( this.reverseLightDir1Location, currLight.direction.xyz );
             gl.uniform1f( this.lightStrength1Location, currLight.strength );
         case 1:
             var currLight = dirLightsInScene[0];
-            gl.uniform3f( this.reverseLightDir0Location, -currLight.direction.x, -currLight.direction.y, -currLight.direction.z );
+            gl.uniform3fv( this.reverseLightDir0Location, currLight.direction.xyz );
             gl.uniform1f( this.lightStrength0Location, currLight.strength );
         default: break;
     }
+
+// #endregion
 
 
 
