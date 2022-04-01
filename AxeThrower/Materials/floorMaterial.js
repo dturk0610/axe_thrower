@@ -104,9 +104,6 @@ function floorMatSetup(){
     floorMaterial.Is = new Vector3( 0.8, 0.8, 0.8 );
     floorMaterial.abcDist = new Vector3( .05, 0.0, 0.0 );
 
-    floorMaterial.renderSetup = floorRenderSetup;
-    floorMaterial.render = floorRender;
-
     return floorMaterial;
 
 }

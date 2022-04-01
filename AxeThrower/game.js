@@ -4,6 +4,7 @@ var myScene;
 var pastTime;
 
 var floorShader, lightShader;
+var baseShader;
 
 function init(){
     var canvas = document.getElementById( "gl-canvas" );
@@ -38,6 +39,7 @@ function setupGL(){
     
     floorShader = initShaders( gl, "vertex-shader-quad", "fragment-shader" );
     lightShader = initShaders( gl, "vertex-phrongLighting", "fragment-phrongLighting" );
+    baseShader = initShaders( gl, "vertex-lighting", "fragment-lighting" );
 }
 
 
@@ -67,15 +69,14 @@ function setupScene(){
 
     var brownCol = new Vector4( 66.0/256.0, 40.0/256.0, 14.0/256.0, 1.0 );
     var floor = new Quad( 10, 10, new Vector4( 0, 0, 0, 1), new Quat( 0, 0, 0, 1 ), new Vector3( 1, 1, 1 ) );
-    var basicMaterial = baseMatSetup();
-    basicMaterial.gameObject = floor;
-    floor.meshRenderer = new MeshRenderer( floor, basicMaterial );
+    var basicMaterial = new Material( baseShader, floor, brownCol );
+    floor.meshRenderer = new MeshRenderer( floor, basicMaterial, baseRenderSetup, baseRender );
     myScene.addObject( floor );
 
     var wall1 = new Quad( 10, 2, new Vector4(  0, 1, 5, 1), Quat.fromAxisAndAngle( new Vector3( 1, 0, 0 ), 90 ), new Vector3( 1, 1, 1 ) );
     var floorMat = floorMatSetup();
     floorMat.gameObject = wall1;
-    wall1.meshRenderer = new MeshRenderer( wall1, floorMat );
+    wall1.meshRenderer = new MeshRenderer( wall1, floorMat, floorRenderSetup, floorRender );
     wall1.color = brownCol;
     myScene.addObject( wall1 );
 
@@ -84,14 +85,14 @@ function setupScene(){
     var wall2 = new Quad( 10, 2, new Vector4(  5, 1, 0, 1), Quat.mult( yTurn, zTurn ), new Vector3( 1, 1, 1 ) ); 
     var floorMat = floorMatSetup();
     floorMat.gameObject = wall2;
-    wall2.meshRenderer = new MeshRenderer( wall2, floorMat );
+    wall2.meshRenderer = new MeshRenderer( wall2, floorMat, floorRenderSetup, floorRender );
     wall2.color = brownCol;
     myScene.addObject( wall2 );
 
     var wall3 = new Quad( 10, 2, new Vector4(  0, 1, -5, 1), Quat.fromAxisAndAngle( new Vector3( -1, 0, 0 ), 90 ), new Vector3( 1, 1, 1 ) );
     var floorMat = floorMatSetup();
     floorMat.gameObject = wall3;
-    wall3.meshRenderer = new MeshRenderer( wall3, floorMat );
+    wall3.meshRenderer = new MeshRenderer( wall3, floorMat, floorRenderSetup, floorRender );
     wall3.color = brownCol;
     myScene.addObject( wall3 );
 
@@ -100,7 +101,7 @@ function setupScene(){
     var wall4 = new Quad( 10, 2, new Vector4( -5, 1, 0, 1), Quat.mult( yTurn, zTurn ), new Vector3( 1, 1, 1 ) );
     var floorMat = floorMatSetup();
     floorMat.gameObject = wall4;
-    wall4.meshRenderer = new MeshRenderer( wall4, floorMat );
+    wall4.meshRenderer = new MeshRenderer( wall4, floorMat, floorRenderSetup, floorRender );
     wall4.color = brownCol;
     myScene.addObject( wall4 );
 
@@ -110,9 +111,8 @@ function setupScene(){
     // var chairMat = chairMatSetup();
     // chairMat.gameObject = chair;
     // chair.meshRenderer = new MeshRenderer( chair, chairMat );
-    var basicMaterial = baseMatSetup();
-    basicMaterial.gameObject = chair;
-    chair.meshRenderer = new MeshRenderer( chair, basicMaterial );
+    var basicMaterial = new Material( baseShader, chair );
+    chair.meshRenderer = new MeshRenderer( chair, basicMaterial, baseRenderSetup, baseRender );
     myScene.addObject( chair );
 
 }

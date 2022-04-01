@@ -227,9 +227,19 @@ class Material{
     /**
      * 
      * @param {*} shader 
+     * @param {GameObject} gameObj
+     * @param {Vector3} ambient 
+     * @param {Vector3} diffuse 
+     * @param {Vector3} specular 
+     * @param {number} shininess 
      */
-    constructor( shader ){
+    constructor( shader, gameObj, ambient = new Vector3( 1.0, 0.5, 0.31 ), diffuse = new Vector3( 1.0, 0.5, 0.31 ), specular = new Vector3( 0.5, 0.5, 0.5 ), shininess = 32.0 ){
         this.shaderProgram = shader;
+        this.gameObject = gameObj;
+        this.ambient = ambient;
+        this.diffuse = diffuse;
+        this.specular = specular;
+        this.shininess = shininess;;
     }
 
 }
@@ -243,12 +253,12 @@ class MeshRenderer{
 
     static setGL ( gl ) { MeshRenderer.gl = gl; };
 
-    constructor( gameObj, material ){
+    constructor( gameObj, material, renderSetup, render ){
         this.gameObject = gameObj;
         this.material = material;
         this.shaderProgram = this.material.shaderProgram;
-        this.setupFunc = this.material.renderSetup;
-        this.renderFunc = this.material.render;
+        this.setupFunc = renderSetup;
+        this.renderFunc = render;
         this.gl = MeshRenderer.gl;
         this.setupFunc();
     }

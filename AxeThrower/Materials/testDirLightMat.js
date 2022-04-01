@@ -346,22 +346,3 @@ baseRender = function(){
     gl.drawElements( gl.TRIANGLES, 3 * numTriangles, gl.UNSIGNED_SHORT, 0 );
 }
 
-function baseMatSetup(){
-    var shader = initShaders( gl, "vertex-lighting", "fragment-lighting" );
-
-    var baseMaterial = new Material( shader );
-
-    baseMaterial.ambient = new Vector3( 1.0, 0.5, 0.31 );
-    baseMaterial.diffuse = new Vector3( 1.0, 0.5, 0.31 );
-    baseMaterial.specular = new Vector3( 0.5, 0.5, 0.5 );
-    baseMaterial.shininess = 32.0;
-
-    baseMaterial.renderSetup = baseRenderSetup;
-    baseMaterial.render = baseRender;
-
-    return baseMaterial;
-
-}
-
-
-
