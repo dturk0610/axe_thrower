@@ -57,6 +57,10 @@ function setupScene(){
     var dirLight2 = new DirectionalLight( dir2Base, new Vector3( 1, -1, -1 ) );
     Scene.AddDirLight( dirLight2 );
 
+    var dir3Base = new BaseLight( new Vector3( 0.1, 0.1, 0.1 ), new Vector3( 0.3, 0.2, 0.3 ), new Vector3( 1.0, 1.0, 1.0 ) );
+    var dirLight3 = new DirectionalLight( dir3Base, new Vector3( -1, -1, 1 ) );
+    Scene.AddDirLight( dirLight3 );
+
     var pt1Base = new BaseLight( new Vector3( 0.1, 0.1, 0.1 ), new Vector3( 0.3, 0.2, 0.3 ), new Vector3( 1.0, 1.0, 1.0 ) );
     var ptLight1 = new PointLight( pt1Base, new Vector3( 2.0, 0.5, -4.5 ), 0.05, 0.04, 0.3 );
     Scene.AddPtLight( ptLight1 );
