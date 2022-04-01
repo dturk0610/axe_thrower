@@ -49,11 +49,20 @@ function setupScene(){
 
     var dir1Base = new BaseLight( new Vector3( 0.2, 0.2, 0.2 ), new Vector3( 0.5, 0.5, 0.5 ), new Vector3( 1.0, 1.0, 1.0 ) );
     var dirLight1 = new DirectionalLight( dir1Base, new Vector3( 1, -1, 0 ) );
-    Scene.AddDirLight( dirLight1 );
+    //Scene.AddDirLight( dirLight1 );
 
     var dir2Base = new BaseLight( new Vector3( 0.1, 0.1, 0.1 ), new Vector3( 0.3, 0.2, 0.3 ), new Vector3( 1.0, 1.0, 1.0 ) );
     var dirLight2 = new DirectionalLight( dir2Base, new Vector3( 0, 0, -1 ) );
     Scene.AddDirLight( dirLight2 );
+
+    var pt1Base = new BaseLight( new Vector3( 0.1, 0.1, 0.1 ), new Vector3( 0.3, 0.2, 0.3 ), new Vector3( 1.0, 1.0, 1.0 ) );
+    var ptLight1 = new PointLight( pt1Base, new Vector3( 0.0, 0.001, -0.01 ), 0.5, 0.0, 2.0 );
+    //Scene.AddPtLight( ptLight1 );
+    
+    var pt2Base = new BaseLight( new Vector3( 0.1, 0.1, 0.1 ), new Vector3( 0.3, 0.2, 0.3 ), new Vector3( 1.0, 1.0, 1.0 ) );
+    var ptLight2 = new PointLight( pt2Base, new Vector3( 0.0, 0.001, 0.0 ), 0.5, 0.0, 2.0 );
+    //Scene.AddPtLight( ptLight2 );
+
 
     var brownCol = new Vector4( 66.0/256.0, 40.0/256.0, 14.0/256.0, 1.0 );
     var floor = new Quad( 10, 10, new Vector4( 0, 0, 0, 1), new Quat( 0, 0, 0, 1 ), new Vector3( 1, 1, 1 ) );

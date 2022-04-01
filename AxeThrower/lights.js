@@ -1,4 +1,5 @@
 
+//https://learnopengl.com/Lighting/Multiple-lights
 class BaseLight{
 
     /**
@@ -30,4 +31,19 @@ class DirectionalLight{
 
 class PointLight{
 
+    /**
+     * 
+     * @param {BaseLight} base 
+     * @param {Vector3} pos 
+     * @param {number} constant 
+     * @param {number} linear 
+     * @param {number} quadratic 
+     */
+    constructor( base = BaseLight(), pos = new Vector3( 0.0, 0.0, 0.0 ), constant = 0.0, linear = 0.0, quadratic = 0.0 ){
+        this.base = base;
+        this.pos = pos;
+        this.constant = constant;
+        this.linear = linear;
+        this.quadratic = quadratic;
+    }
 }
