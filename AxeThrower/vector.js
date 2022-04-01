@@ -95,7 +95,7 @@ class Vector4{
      * @param {Vector4} u 
      * @returns 
      */
-    static Dot( v, u ){
+    static dot( v, u ){
         return ( v.x*u.x + v.y*u.y + v.z*u.z + v.w*u.w );
     }
 
@@ -126,7 +126,7 @@ class Vector4{
      * @param {Vector4} u 
      * @returns 
      */
-     static Sub( v, u ){
+     static sub( v, u ){
         return new Vector4( v.x - u.x, v.y - u.y, v.z - u.z );
     }
 
@@ -136,7 +136,7 @@ class Vector4{
      * @param {Vector4} v 
      * @returns 
      */
-     Sub( v ){
+     sub( v ){
         return new Vector4( this.x - v.x, this.y - v.y, this.z - v.z );
     }
 
@@ -168,7 +168,7 @@ class Vector4{
      * @param {number} ratio
      */
      static Lerp( v, u, ratio ){
-        return v.Add( Vector4.Scale( ratio, u.Sub( v )) );
+        return v.Add( Vector4.Scale( ratio, u.sub( v )) );
     }
     
     /**
@@ -236,7 +236,7 @@ class Vector3{
      * @param {Vector3} u 
      * @returns 
      */
-    static Dot( v, u ){
+    static dot( v, u ){
         return ( v.x*u.x + v.y*u.y + v.z*u.z );
     }
 
@@ -265,7 +265,7 @@ class Vector3{
      * @param {Vector3} u 
      * @returns 
      */
-     static Sub( v, u ){
+     static sub( v, u ){
         return new Vector3( v.x - u.x, v.y - u.y, v.z - u.z );
     }
 
@@ -274,7 +274,7 @@ class Vector3{
      * @param {Vector3} v 
      * @returns 
      */
-     Sub( v ){
+     sub( v ){
         return new Vector3( this.x - v.x, this.y - v.y, this.z - v.z );
     }
 
@@ -284,7 +284,7 @@ class Vector3{
      * @param {Vector3} u 
      * @returns 
      */
-    static Cross( v, u ){
+    static cross( v, u ){
         var newX = v.y*u.z - v.z*u.y;
         var newY = v.z*u.x - v.x*u.z;
         var newZ = v.x*u.y - v.y*u.x;
@@ -314,7 +314,7 @@ class Vector3{
      * @param {number} ratio
      */
     static Lerp( v, u, ratio ){
-        return v.Add( Vector4.Scale( ratio, u.Sub(v)) );
+        return v.Add( Vector4.Scale( ratio, u.sub(v)) );
     }
 
     /**
@@ -352,7 +352,7 @@ class Vector2{
      * @param {Vector2} u 
      * @returns 
      */
-    static Dot( v, u ){
+    static dot( v, u ){
         return ( v.x*u.x + v.y*u.y );
     }
 

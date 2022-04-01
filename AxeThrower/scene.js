@@ -44,6 +44,18 @@ class Scene{
         return Scene.PointLights;
     }
 
+    /**
+     * 
+     * @param {string} tag the name of the object when loaded in scene
+     * @returns the first object with a tag matching the one passed in
+     */
+    getObjectWithTag( tag ){
+        for (var i = 0; i < this.objects.length; i++){
+            var currObj = this.objects[i];
+            if ( currObj.tag == tag ) return currObj;
+        }
+    }
+
     addObject( obj ){
         this.objects.push( obj );
     }

@@ -45,6 +45,10 @@ class Quat{
         return new Quat( x, y, z, w );
     }
 
+    static scale( q, s ){
+        return new Quat( q.x*s, q.y*s, q.z*s, q.w*s );
+    }
+
     /**
      * The matrix implemented here can be found at this url.
      * https://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/index.htm

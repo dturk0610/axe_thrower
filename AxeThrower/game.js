@@ -128,7 +128,24 @@ function drawScene( now ){
         }        
     });
 
+
+    if (holdingE){ 
+        var chairObj = myScene.getObjectWithTag( "chair" );
+        var dirToPoint = Vector4.sub( chairObj.transform.position, Scene.mainCam.transform.position ).toVector3().normalized;
+        var speed = 30.0;
+        var dotXVal = Vector3.dot( cam.transform.fwdVec, dirToPoint );
+        var axis = Vector3.cross( cam.transform.fwdVec, dirToPoint );
+        var angleX = Math.acos( dotXVal );
+
+        cam.transform.rotation = Quat.mult( cam.transform.rotation, Quat.fromAxisAndAngle( axis, -angleX * speed ) );
+        cam.transform.updateRotation();
+        var newRight = Vector3.cross( dirToPoint, new Vector3( 0, 1, 0 ) ).normalized;
+        var dotYVal = Vector3.dot( newRight, cam.transform.rightVec );
+        var angleY = Math.acos( dotYVal );
+        cam.transform.rotation = Quat.mult( cam.transform.rotation, Quat.fromAxisAndAngle( dirToPoint, -angleY ) );
+    }
     cam.update( timeDelta );
+
 
     pastTime = now;
     requestAnimationFrame(drawScene);
@@ -181,19 +198,20 @@ function endClick( canvas, event ){
 }
 
 
-var keyW = false, keyA = false, keyS = false, keyD = false;
+var holdingE = false;
 function onKeyDown(event) {
     var rightVec = myScene.camera.transform.rightVec;
     var fwdVec = myScene.camera.transform.fwdVec; // To actually move forward we need the negative of this
     var totDir = new Vector3( 0, 0, 0 );
     var keyCode = event.keyCode;
     switch (keyCode) {
-        case 87: totDir.x -= fwdVec.x;    totDir.y -= fwdVec.y;     totDir.z -= fwdVec.z;     break; // w
+        case 87: totDir.x += fwdVec.x;    totDir.y += fwdVec.y;     totDir.z += fwdVec.z;     break; // w
         case 65: totDir.x -= rightVec.x;  totDir.y -= rightVec.y;   totDir.z -= rightVec.z;   break; // a
-        case 83: totDir.x += fwdVec.x;    totDir.y += fwdVec.y;     totDir.z += fwdVec.z;     break; // s
+        case 83: totDir.x -= fwdVec.x;    totDir.y -= fwdVec.y;     totDir.z -= fwdVec.z;     break; // s
         case 68: totDir.x += rightVec.x;  totDir.y += rightVec.y;   totDir.z += rightVec.z;   break; // d 
         case 79: Scene.mainCam.orthoOn = !Scene.mainCam.orthoOn; break; // o
         case 76: Scene.ToggleSpec(); break; // l
+        case 69: holdingE = true; break;
     }
 
     if ( totDir.x != 0 || totDir.y != 0 || totDir.z != 0 ){
@@ -204,9 +222,6 @@ function onKeyDown(event) {
 function onKeyUp(event) {
     var keyCode = event.keyCode;
     switch (keyCode) {
-        case 87: keyW = false; break; // w
-        case 65: keyA = false; break; // a
-        case 83: keyS = false; break; // s
-        case 68: keyD = false; break; // d
+        case 69: holdingE = false; break;
     }
 }

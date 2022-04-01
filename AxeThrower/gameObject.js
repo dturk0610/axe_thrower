@@ -109,7 +109,7 @@ class Transform{
         var rotMat = Quat.toMat4(this.rotation);
         this.rightVec = Matrix.vecMatMult( new Vector4( 1, 0, 0, 1 ), rotMat ).toVector3();
         this.upVec = Matrix.vecMatMult( new Vector4( 0, 1, 0, 1 ), rotMat ).toVector3();
-        this.fwdVec = Matrix.vecMatMult( new Vector4( 0, 0, 1, 1 ), rotMat ).toVector3();
+        this.fwdVec = Matrix.vecMatMult( new Vector4( 0, 0, -1, 1 ), rotMat ).toVector3();
     }
 
     calcWorldMat(){
@@ -185,7 +185,7 @@ class Mesh{
 
             var p1minusp0 = new Vector3( p1.x - p0.x, p1.y - p0.y, p1.z - p0.z );
             var p2minusp0 = new Vector3( p2.x - p0.x, p2.y - p0.y, p2.z - p0.z );
-            var faceNormal = Vector3.Cross( p1minusp0, p2minusp0 );
+            var faceNormal = Vector3.cross( p1minusp0, p2minusp0 );
             faceNormal = faceNormal.normalized;
             faceNormals.push( faceNormal );
         }
