@@ -46,7 +46,7 @@ function setupGL(){
 function setupScene(){
     var aspect = w/h;
 
-    var cam = new Camera( new Vector4( 0, 1, 0, 1 ), new Quat( 0, 0, 0, 1 ), aspect, .01, 4000, 60, -1*aspect, 1*aspect, 1, -1 );
+    var cam = new Camera( new Vector4( 0, 1, 0, 1 ), new Quat( 0, 0, 0, 1 ), aspect, .01, 1000, 60, -1*aspect, 1*aspect, 1, -1 );
     myScene = new Scene( cam );
 
     var dir1Base = new BaseLight( new Vector3( 0.2, 0.2, 0.2 ), new Vector3( 0.5, 0.5, 0.5 ), new Vector3( 1.0, 1.0, 1.0 ) );
@@ -54,7 +54,7 @@ function setupScene(){
     Scene.AddDirLight( dirLight1 );
 
     var dir2Base = new BaseLight( new Vector3( 0.1, 0.1, 0.1 ), new Vector3( 0.3, 0.2, 0.3 ), new Vector3( 1.0, 1.0, 1.0 ) );
-    var dirLight2 = new DirectionalLight( dir2Base, new Vector3( 0, 0, -1 ) );
+    var dirLight2 = new DirectionalLight( dir2Base, new Vector3( 1, -1, -1 ) );
     Scene.AddDirLight( dirLight2 );
 
     var pt1Base = new BaseLight( new Vector3( 0.1, 0.1, 0.1 ), new Vector3( 0.3, 0.2, 0.3 ), new Vector3( 1.0, 1.0, 1.0 ) );
@@ -62,8 +62,12 @@ function setupScene(){
     Scene.AddPtLight( ptLight1 );
     
     var pt2Base = new BaseLight( new Vector3( 0.1, 0.1, 0.1 ), new Vector3( 0.3, 0.2, 0.3 ), new Vector3( 1.0, 1.0, 1.0 ) );
-    var ptLight2 = new PointLight( pt2Base, new Vector3( 0.0, 1.0, -3.5 ), 0.5, 0.2, 1.0 );
+    var ptLight2 = new PointLight( pt2Base, new Vector3( -3.5, 1.0, -3.5 ), 0.5, 0.2, 1.0 );
     Scene.AddPtLight( ptLight2 );
+    
+    var pt3Base = new BaseLight( new Vector3( 0.1, 0.1, 0.1 ), new Vector3( 0.3, 0.2, 0.3 ), new Vector3( 1.0, 1.0, 1.0 ) );
+    var ptLight3 = new PointLight( pt3Base, new Vector3( 4.5, 1.0, 4.5 ), 0.5, 0.2, 1.0 );
+    Scene.AddPtLight( ptLight3 );
 
 
 
@@ -74,43 +78,32 @@ function setupScene(){
     myScene.addObject( floor );
 
     var wall1 = new Quad( 10, 2, new Vector4(  0, 1, 5, 1), Quat.fromAxisAndAngle( new Vector3( 1, 0, 0 ), 90 ), new Vector3( 1, 1, 1 ) );
-    var floorMat = floorMatSetup();
-    floorMat.gameObject = wall1;
-    wall1.meshRenderer = new MeshRenderer( wall1, floorMat, floorRenderSetup, floorRender );
-    wall1.color = brownCol;
+    var basicMaterial = new Material( baseShader, wall1, brownCol );
+    wall1.meshRenderer = new MeshRenderer( wall1, basicMaterial, baseRenderSetup, baseRender );
     myScene.addObject( wall1 );
 
     var yTurn = Quat.fromAxisAndAngle( new Vector3( 0, 1, 0 ), 90 );
     var zTurn = Quat.fromAxisAndAngle( new Vector3( 0, 0, -1 ), 90 );
     var wall2 = new Quad( 10, 2, new Vector4(  5, 1, 0, 1), Quat.mult( yTurn, zTurn ), new Vector3( 1, 1, 1 ) ); 
-    var floorMat = floorMatSetup();
-    floorMat.gameObject = wall2;
-    wall2.meshRenderer = new MeshRenderer( wall2, floorMat, floorRenderSetup, floorRender );
-    wall2.color = brownCol;
+    var basicMaterial = new Material( baseShader, wall2, brownCol );
+    wall2.meshRenderer = new MeshRenderer( wall2, basicMaterial, baseRenderSetup, baseRender );
     myScene.addObject( wall2 );
 
     var wall3 = new Quad( 10, 2, new Vector4(  0, 1, -5, 1), Quat.fromAxisAndAngle( new Vector3( -1, 0, 0 ), 90 ), new Vector3( 1, 1, 1 ) );
-    var floorMat = floorMatSetup();
-    floorMat.gameObject = wall3;
-    wall3.meshRenderer = new MeshRenderer( wall3, floorMat, floorRenderSetup, floorRender );
-    wall3.color = brownCol;
+    var basicMaterial = new Material( baseShader, wall3, brownCol );
+    wall3.meshRenderer = new MeshRenderer( wall3, basicMaterial, baseRenderSetup, baseRender );
     myScene.addObject( wall3 );
 
     var yTurn = Quat.fromAxisAndAngle( new Vector3( 0, 1, 0 ), 90 );
     var zTurn = Quat.fromAxisAndAngle( new Vector3( 0, 0, 1 ), 90 );
     var wall4 = new Quad( 10, 2, new Vector4( -5, 1, 0, 1), Quat.mult( yTurn, zTurn ), new Vector3( 1, 1, 1 ) );
-    var floorMat = floorMatSetup();
-    floorMat.gameObject = wall4;
-    wall4.meshRenderer = new MeshRenderer( wall4, floorMat, floorRenderSetup, floorRender );
-    wall4.color = brownCol;
+    var basicMaterial = new Material( baseShader, wall4, brownCol );
+    wall4.meshRenderer = new MeshRenderer( wall4, basicMaterial, baseRenderSetup, baseRender );
     myScene.addObject( wall4 );
 
 
     var chair = new GameObject( "chair", new Vector4( 0, .45, -4, 1 ), Quat.identity, new Vector3( .02, .02, .02 ) );
     chair.mesh = new Mesh( getChairVertices(), getChairFaces() );
-    // var chairMat = chairMatSetup();
-    // chairMat.gameObject = chair;
-    // chair.meshRenderer = new MeshRenderer( chair, chairMat );
     var basicMaterial = new Material( baseShader, chair );
     chair.meshRenderer = new MeshRenderer( chair, basicMaterial, baseRenderSetup, baseRender );
     myScene.addObject( chair );
@@ -149,7 +142,7 @@ function tryClick( canvas, event ){
 
 // found a good way to handle this here:
 //https://gamedev.stackexchange.com/questions/30644/how-to-keep-my-quaternion-using-fps-camera-from-tilting-and-messing-up/30669#30669
-var turnAmount = .3;
+var turnAmount = .6;
 function mouseMove( canvas, event ){
     if (mouseDown){
         var cam = myScene.camera;
