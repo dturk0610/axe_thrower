@@ -6,6 +6,7 @@ class Scene{
     static PointLights = [];
     static MaxDirLights = 5; // This value matches the one in the fragment shader for this
     static MaxPtLights = 10; // This value matches the one in the fragment shader for this
+    static useSpecular = true;
 
     constructor( camera, objects = [] ){
         this.objects = objects;
@@ -45,5 +46,9 @@ class Scene{
 
     addObject( obj ){
         this.objects.push( obj );
+    }
+
+    static ToggleSpec(){
+        Scene.useSpecular = !Scene.useSpecular;
     }
 }

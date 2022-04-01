@@ -173,7 +173,7 @@
     void main() {
 
         vec4 vertexPositionTransformed = worldMat * vertexPosition;
-
+        fragPos = (worldMat * vertexPosition).xyz;
         gl_Position = projectMat * vertexPositionTransformed;
 
         vec4 tempNV = vec4( nv.x, nv.y, nv.z, 1.0 );
@@ -225,8 +225,7 @@
     };
 
     uniform Material material;
-
-    uniform vec4 u_color;
+    uniform bool useSpec;
     uniform vec3 viewPos;
     varying vec3 fragPos;
 
@@ -237,38 +236,44 @@
         float diff = max( dot( n, -dirLight.lightDirection ), 0.0 );
         vec3 diffuse = dirLight.base.diffuse * diff * material.diffuse;
 
-        vec3 viewDir = normalize( viewPos - fragPos );
-        vec3 reflectDir = reflect( dirLight.lightDirection, n );
-        float spec = pow( max( dot( viewDir, reflectDir ), 0.0 ), material.shininess );
-        vec3 specular = dirLight.base.specular * spec * material.specular;
+        vec3 specular = vec3( 0.0 );
+        if ( useSpec ){
+            vec3 viewDir = normalize( viewPos - fragPos );
+            vec3 reflectDir = reflect( dirLight.lightDirection, n );
+            float spec = pow( max( dot( viewDir, reflectDir ), 0.0 ), material.shininess );
+            specular = dirLight.base.specular * spec * material.specular;
+        }
 
         return ambient + diffuse + specular;
     }
     
     vec3 CalcPointLight( PointLight light, vec3 n )
     {
-
-        vec3 disp = light.pos - fragPos;
-        vec3 lightDir = normalize( disp );
+        vec3 lightDir = normalize( light.pos - fragPos );
         // diffuse shading
         float diff = max( dot( n, lightDir ), 0.0 );
-        // specular shading
-        vec3 viewDir = normalize( viewPos - fragPos );
-        vec3 reflectDir = reflect( -lightDir, n );
-        float spec = pow( max( dot( viewDir, reflectDir ), 0.0 ), material.shininess );
 
         // attenuation
-        float distance = length( disp );
-        float attenuation = 1.0 / ( light.constant + light.linear * distance + light.quadratic * ( distance * distance ) );    
+        float distance = length( light.pos - fragPos );
+        float attenuation = 1.0 / ( light.constant + light.linear * distance + light.quadratic * ( distance * distance )  + 0.00001 );    
 
         // combine results
         vec3 ambient  = light.base.ambient  * material.ambient;
         vec3 diffuse  = light.base.diffuse  * diff * material.diffuse;
-        vec3 specular = light.base.specular * spec * material.specular;
+        vec3 specular = vec3( 0.0 );
+
+        if ( useSpec ){
+            // specular shading
+            vec3 viewDir = normalize( viewPos - fragPos );
+            vec3 reflectDir = reflect( -lightDir, n );
+            float spec = pow( max( dot( viewDir, reflectDir ), 0.0 ), material.shininess );
+            specular = light.base.specular * spec * material.specular;
+        }
 
         ambient  *= attenuation;
         diffuse  *= attenuation;
         specular *= attenuation;
+
         return (ambient + diffuse + specular);
     }
 
@@ -311,7 +316,7 @@
 </head>
 
 <body onload = "init()">
-    <canvas id="gl-canvas" height="900" width="1600">
+    <canvas id="gl-canvas" height="450" width="800"> <!-- I really want this to be 900, 1600 though -->
     </canvas>
 </body>
 </html>

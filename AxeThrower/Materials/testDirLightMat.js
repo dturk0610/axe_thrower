@@ -1,5 +1,5 @@
 
-dirRenderSetup = function(){
+baseRenderSetup = function(){
 
     this.indexBuffer = gl.createBuffer();
     this.verticesBuffer = gl.createBuffer();
@@ -7,12 +7,11 @@ dirRenderSetup = function(){
     this.normalsBuffer = gl.createBuffer();
     this.vertexNormalPointer = gl.getAttribLocation( this.shaderProgram, "nv" )
     this.viewPosLoc = gl.getUniformLocation( this.shaderProgram, "viewPos" );
-
     this.worldMatLocation = gl.getUniformLocation( this.shaderProgram, "worldMat" );
     this.worldMatInverseLocation = gl.getUniformLocation( this.shaderProgram, "worldMatInverse" );
     this.worldMatTransposeInverseLocation = gl.getUniformLocation( this.shaderProgram, "worldMatTransposeInverse" );
     this.perspectiveProjectionMatricLocation = gl.getUniformLocation( this.shaderProgram, "projectMat" );
-    this.colUniformLocation = gl.getUniformLocation( this.shaderProgram, "u_color" );
+    this.useSpecLoc = gl.getUniformLocation( this.shaderProgram, "useSpec" );
 
 // #region DIRECTIONAL LIGHT LOCATIONS
 
@@ -144,7 +143,7 @@ dirRenderSetup = function(){
 
 }
 
-dirRender = function(){
+baseRender = function(){
     gl.useProgram( this.shaderProgram );
 
     var mesh = this.gameObject.mesh;
@@ -189,12 +188,9 @@ dirRender = function(){
     gl.uniformMatrix4fv( this.worldMatLocation, false, worldMat );
     gl.uniformMatrix4fv( this.worldMatTransposeInverseLocation, false, worldMatTransposeInverse );
     gl.uniformMatrix4fv( this.worldMatInverseLocation, false, worldMatInverse );
-
     gl.uniformMatrix4fv( this.perspectiveProjectionMatricLocation, false, viewProjectMat );
-    
-    var color = this.gameObject.color;
-    gl.uniform4f( this.colUniformLocation, color.r, color.g, color.b, color.a );
 
+    gl.uniform1i( this.useSpecLoc, Scene.useSpecular );
 
 // #region DIRECTIONAL LIGHT SETTINGS
 
@@ -350,23 +346,20 @@ dirRender = function(){
     gl.drawElements( gl.TRIANGLES, 3 * numTriangles, gl.UNSIGNED_SHORT, 0 );
 }
 
-function lightDirMatSetup(){
+function baseMatSetup(){
     var shader = initShaders( gl, "vertex-lighting", "fragment-lighting" );
 
-    var dirMaterial = new Material( shader );
+    var baseMaterial = new Material( shader );
 
-    dirMaterial.ambient = new Vector3( 1.0, 0.5, 0.31 );
-    dirMaterial.diffuse = new Vector3( 1.0, 0.5, 0.31 );
-    dirMaterial.specular = new Vector3( 0.5, 0.5, 0.5 );
-    dirMaterial.shininess = 10.0;
+    baseMaterial.ambient = new Vector3( 1.0, 0.5, 0.31 );
+    baseMaterial.diffuse = new Vector3( 1.0, 0.5, 0.31 );
+    baseMaterial.specular = new Vector3( 0.5, 0.5, 0.5 );
+    baseMaterial.shininess = 32.0;
 
-    //dirMaterial.lightDir = (new Vector3( 1, -1, 0 )).normalized;
-    //dirMaterial.lightStrength = 1.0;
+    baseMaterial.renderSetup = baseRenderSetup;
+    baseMaterial.render = baseRender;
 
-    dirMaterial.renderSetup = dirRenderSetup;
-    dirMaterial.render = dirRender;
-
-    return dirMaterial;
+    return baseMaterial;
 
 }
 

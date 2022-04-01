@@ -49,27 +49,27 @@ function setupScene(){
 
     var dir1Base = new BaseLight( new Vector3( 0.2, 0.2, 0.2 ), new Vector3( 0.5, 0.5, 0.5 ), new Vector3( 1.0, 1.0, 1.0 ) );
     var dirLight1 = new DirectionalLight( dir1Base, new Vector3( 1, -1, 0 ) );
-    //Scene.AddDirLight( dirLight1 );
+    Scene.AddDirLight( dirLight1 );
 
     var dir2Base = new BaseLight( new Vector3( 0.1, 0.1, 0.1 ), new Vector3( 0.3, 0.2, 0.3 ), new Vector3( 1.0, 1.0, 1.0 ) );
     var dirLight2 = new DirectionalLight( dir2Base, new Vector3( 0, 0, -1 ) );
     Scene.AddDirLight( dirLight2 );
 
     var pt1Base = new BaseLight( new Vector3( 0.1, 0.1, 0.1 ), new Vector3( 0.3, 0.2, 0.3 ), new Vector3( 1.0, 1.0, 1.0 ) );
-    var ptLight1 = new PointLight( pt1Base, new Vector3( 0.0, 0.001, -0.01 ), 0.5, 0.0, 2.0 );
-    //Scene.AddPtLight( ptLight1 );
+    var ptLight1 = new PointLight( pt1Base, new Vector3( 2.0, 0.5, -4.5 ), 0.05, 0.04, 0.3 );
+    Scene.AddPtLight( ptLight1 );
     
     var pt2Base = new BaseLight( new Vector3( 0.1, 0.1, 0.1 ), new Vector3( 0.3, 0.2, 0.3 ), new Vector3( 1.0, 1.0, 1.0 ) );
-    var ptLight2 = new PointLight( pt2Base, new Vector3( 0.0, 0.001, 0.0 ), 0.5, 0.0, 2.0 );
-    //Scene.AddPtLight( ptLight2 );
+    var ptLight2 = new PointLight( pt2Base, new Vector3( 0.0, 1.0, -3.5 ), 0.5, 0.2, 1.0 );
+    Scene.AddPtLight( ptLight2 );
+
 
 
     var brownCol = new Vector4( 66.0/256.0, 40.0/256.0, 14.0/256.0, 1.0 );
     var floor = new Quad( 10, 10, new Vector4( 0, 0, 0, 1), new Quat( 0, 0, 0, 1 ), new Vector3( 1, 1, 1 ) );
-    var floorMat = floorMatSetup();
-    floorMat.gameObject = floor;
-    floor.meshRenderer = new MeshRenderer( floor, floorMat );
-    floor.color = Vector4.Scale( 1.2, brownCol );
+    var basicMaterial = baseMatSetup();
+    basicMaterial.gameObject = floor;
+    floor.meshRenderer = new MeshRenderer( floor, basicMaterial );
     myScene.addObject( floor );
 
     var wall1 = new Quad( 10, 2, new Vector4(  0, 1, 5, 1), Quat.fromAxisAndAngle( new Vector3( 1, 0, 0 ), 90 ), new Vector3( 1, 1, 1 ) );
@@ -110,10 +110,9 @@ function setupScene(){
     // var chairMat = chairMatSetup();
     // chairMat.gameObject = chair;
     // chair.meshRenderer = new MeshRenderer( chair, chairMat );
-    var lightMaterial = lightDirMatSetup();
-    lightMaterial.gameObject = chair;
-    chair.meshRenderer = new MeshRenderer( chair, lightMaterial );
-    chair.color = new Vector4( 0.8, 0.2, .4, 1 );
+    var basicMaterial = baseMatSetup();
+    basicMaterial.gameObject = chair;
+    chair.meshRenderer = new MeshRenderer( chair, basicMaterial );
     myScene.addObject( chair );
 
 }
@@ -196,7 +195,8 @@ function onKeyDown(event) {
         case 65: totDir.x -= rightVec.x;  totDir.y -= rightVec.y;   totDir.z -= rightVec.z;   break; // a
         case 83: totDir.x += fwdVec.x;    totDir.y += fwdVec.y;     totDir.z += fwdVec.z;     break; // s
         case 68: totDir.x += rightVec.x;  totDir.y += rightVec.y;   totDir.z += rightVec.z;   break; // d 
-        case 79: Scene.mainCam.orthoOn = !Scene.mainCam.orthoOn; break;
+        case 79: Scene.mainCam.orthoOn = !Scene.mainCam.orthoOn; break; // o
+        case 76: Scene.ToggleSpec(); break; // l
     }
 
     if ( totDir.x != 0 || totDir.y != 0 || totDir.z != 0 ){
