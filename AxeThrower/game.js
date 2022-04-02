@@ -75,14 +75,14 @@ function setupScene(){
 
 
 
-    var brownCol = new Vector4( 66.0/256.0, 40.0/256.0, 14.0/256.0, 1.0 );
+    var brownCol = new Vector4( 15.0/256.0, 50.0/256.0, 10.0/256.0, 1.0 );
     var floor = new Quad( 10, 10, new Vector4( 0, 0, 0, 1), new Quat( 0, 0, 0, 1 ), new Vector3( 1, 1, 1 ) );
-    var basicMaterial = new Material( baseShader, floor, brownCol );
+    var basicMaterial = new Material( baseShader, floor, brownCol, brownCol, undefined, 10000.0 );
     floor.meshRenderer = new MeshRenderer( floor, basicMaterial, baseRenderSetup, baseRender );
     myScene.addObject( floor );
 
     var wall1 = new Quad( 10, 2, new Vector4(  0, 1, 5, 1), Quat.fromAxisAndAngle( new Vector3( 1, 0, 0 ), 90 ), new Vector3( 1, 1, 1 ) );
-    var basicMaterial = new Material( baseShader, wall1, brownCol );
+    var basicMaterial = new Material( baseShader, wall1, brownCol, undefined, undefined, 10.0 );
     wall1.meshRenderer = new MeshRenderer( wall1, basicMaterial, baseRenderSetup, baseRender );
     myScene.addObject( wall1 );
 
@@ -115,6 +115,7 @@ function setupScene(){
 }
 
 function drawScene( now ){
+
     now *= 0.001;
     if (pastTime === undefined){ pastTime = now; }
     var timeDelta = now - pastTime;
@@ -129,22 +130,11 @@ function drawScene( now ){
     });
 
 
+    cam.update( timeDelta );
     if (holdingE){ 
         var chairObj = myScene.getObjectWithTag( "chair" );
-        var dirToPoint = Vector4.sub( chairObj.transform.position, Scene.mainCam.transform.position ).toVector3().normalized;
-        var speed = 30.0;
-        var dotXVal = Vector3.dot( cam.transform.fwdVec, dirToPoint );
-        var axis = Vector3.cross( cam.transform.fwdVec, dirToPoint );
-        var angleX = Math.acos( dotXVal );
-
-        cam.transform.rotation = Quat.mult( cam.transform.rotation, Quat.fromAxisAndAngle( axis, -angleX * speed ) );
-        cam.transform.updateRotation();
-        var newRight = Vector3.cross( dirToPoint, new Vector3( 0, 1, 0 ) ).normalized;
-        var dotYVal = Vector3.dot( newRight, cam.transform.rightVec );
-        var angleY = Math.acos( dotYVal );
-        cam.transform.rotation = Quat.mult( cam.transform.rotation, Quat.fromAxisAndAngle( dirToPoint, -angleY ) );
+        Scene.mainCam.lookAt( chairObj.transform.position );
     }
-    cam.update( timeDelta );
 
 
     pastTime = now;

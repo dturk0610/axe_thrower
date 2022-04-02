@@ -90,8 +90,12 @@ class Camera{
         var lerpPos = Vector4.Lerp( this.transform.position, this.nextPos, timeDelta*lerpSpeed );
         this.transform.position = lerpPos;
 
+        this.transform.updateRotation();
         this.cameraToWorldMatrix = this.calculateCameraMatrix();
         this.viewMat = this.calculateViewMatrix();
-        this.transform.updateRotation();
+    }
+
+    lookAt( pos ){
+        this.transform.lookAt( pos );
     }
 }

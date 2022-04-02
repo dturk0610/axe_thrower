@@ -41,6 +41,11 @@ class GameObject{
         return this.transform.calcWorldMat();
     }
 
+    update(){
+        this.worldMat = this.calcWorldMat();
+        this.transform.updateRotation();
+    }
+
 }
 
 /**
@@ -97,11 +102,11 @@ class Transform{
             var rotMat = Quat.toMat4(rotation);
             this.rightVec = Matrix.vecMatMult( new Vector4( 1, 0, 0, 1 ), rotMat ).toVector3();
             this.upVec = Matrix.vecMatMult( new Vector4( 0, 1, 0, 1 ), rotMat ).toVector3();
-            this.fwdVec = Matrix.vecMatMult( new Vector4( 0, 0, 1, 1 ), rotMat ).toVector3();
+            this.fwdVec = Matrix.vecMatMult( new Vector4( 0, 0, -1, 1 ), rotMat ).toVector3();
         }else{
             this.rightVec = new Vector3( 1, 0, 0 );
             this.upVec = new Vector3( 0, 1, 0 );
-            this.fwdVec = new Vector3( 0, 0, 1 );
+            this.fwdVec = new Vector3( 0, 0, -1 );
         }
     }
 
@@ -129,6 +134,29 @@ class Transform{
         var scaleRotMat = Matrix.mult4x4( rotMat, scaleMat );
         return Matrix.mult4x4( moveMat, scaleRotMat );
     }
+
+    lookAt( pos ){
+        var fwd = this.fwdVec.normalized;
+        var dirToPoint = Vector4.sub( pos, this.position ).toVector3().normalized;
+        var speed = 15.0;
+        var dotXVal = Vector3.dot( fwd, dirToPoint );
+        if ( dotXVal > 1.0 ) dotXVal = 1.0;
+        var axis = Vector3.cross( fwd, dirToPoint );
+        var angleX = Math.acos( dotXVal );
+        var currRot = this.rotation;
+        currRot = Quat.mult( currRot, Quat.fromAxisAndAngle( axis, -angleX*speed ) );
+
+        this.updateRotation();
+        var right = this.rightVec;
+        var newRight = Vector3.cross( dirToPoint, new Vector3( 0, 1, 0 ) ).normalized;
+        var dotYVal = Vector3.dot( newRight, right );
+        if ( dotYVal > 1.0 ) dotYVal = 1.0;
+        var sign = 1.0;
+        if ( right.y < 0 ) sign = -1.0;
+        var angleY = Math.acos( dotYVal ) * sign;
+        this.rotation = Quat.mult( currRot, Quat.fromAxisAndAngle( dirToPoint, -angleY*speed ) );
+    }
+
 }
 
 /**
