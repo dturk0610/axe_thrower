@@ -88,7 +88,7 @@ class Camera{
     update( timeDelta ){
         
         var lerpSpeed = 5.0;
-        var lerpPos = Vector4.Lerp( this.transform.position, this.nextPos, timeDelta*lerpSpeed );
+        var lerpPos = Vector4.lerp( this.transform.position, this.nextPos, timeDelta*lerpSpeed );
         this.transform.position = lerpPos;
 
         this.transform.updateRotation();

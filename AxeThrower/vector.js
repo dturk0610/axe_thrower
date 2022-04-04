@@ -17,6 +17,13 @@ class Vector4{
     }
 
     /**
+     * @returns the magnitude of the current vector
+     */
+     get magnitude(){
+        return Math.sqrt( this.x*this.x + this.y*this.y + this.z*this.z + this.w*this.w );
+    }
+
+    /**
      * @returns an array of the x, y, z and w positions of this vector.
      */
     get xyzw(){
@@ -105,7 +112,7 @@ class Vector4{
      * @param {Vector4} u 
      * @returns 
      */
-    static Add( v, u ){
+    static add( v, u ){
         return new Vector4( v.x + u.x, v.y + u.y, v.z + u.z );
     }
 
@@ -115,7 +122,7 @@ class Vector4{
      * @param {Vector4} v 
      * @returns 
      */
-    Add( v ){
+    add( v ){
         return new Vector4( this.x + v.x, this.y + v.y, this.z + v.z );
     }
 
@@ -145,7 +152,7 @@ class Vector4{
      * @param {[Vector4]} varr array of vectors to flatten to the GPU.
      * @returns 
      */
-    static Flatten( varr ){
+    static flatten( varr ){
         var ret = new Float32Array( varr.length * 4 );
         for (var i = 0; i < varr.length; i++){
             ret[i*4 + 0] = varr[i].x;
@@ -156,7 +163,7 @@ class Vector4{
         return ret;
     }
 
-    static Scale( amount, v ){
+    static scale( amount, v ){
         return new Vector4( v.x*amount, v.y*amount, v.z*amount );
     }
 
@@ -167,8 +174,8 @@ class Vector4{
      * @param {Vector3} u 
      * @param {number} ratio
      */
-     static Lerp( v, u, ratio ){
-        return v.Add( Vector4.Scale( ratio, u.sub( v )) );
+     static lerp( v, u, ratio ){
+        return v.add( Vector4.scale( ratio, u.sub( v )) );
     }
     
     /**
@@ -198,6 +205,13 @@ class Vector3{
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+
+    /**
+     * @returns the magnitude of the current vector
+     */
+    get magnitude(){
+        return Math.sqrt( this.x*this.x + this.y*this.y + this.z*this.z );
     }
 
     /**
@@ -246,7 +260,7 @@ class Vector3{
      * @param {Vector3} u 
      * @returns 
      */
-     static Add( v, u ){
+     static add( v, u ){
         return new Vector3( v.x + u.x, v.y + u.y, v.z + u.z );
     }
 
@@ -296,7 +310,7 @@ class Vector3{
      * @param {[Vector3]} varr array of vectors to flatten to the GPU.
      * @returns 
      */
-    static Flatten( varr ){
+    static flatten( varr ){
         var ret = new Float32Array( varr.length * 3 );
         for (var i = 0; i < varr.length; i++){
             ret[i*3 + 0] = varr[i].x;
@@ -313,8 +327,8 @@ class Vector3{
      * @param {Vector3} u 
      * @param {number} ratio
      */
-    static Lerp( v, u, ratio ){
-        return v.Add( Vector4.Scale( ratio, u.sub(v)) );
+    static lerp( v, u, ratio ){
+        return v.add( Vector3.scale( ratio, u.sub(v)) );
     }
 
     /**
@@ -362,7 +376,7 @@ class Vector2{
      * @param {Vector2} u 
      * @returns 
      */
-    static Add( v, u ){
+    static aßdd( v, u ){
         return new Vector3( v.x + u.x, v.y + u.y );
     }
 }

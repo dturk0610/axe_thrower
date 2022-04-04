@@ -155,7 +155,7 @@ baseRender = function(){
     gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexList), gl.STATIC_DRAW );
 
     gl.bindBuffer( gl.ARRAY_BUFFER, this.verticesBuffer );
-    gl.bufferData( gl.ARRAY_BUFFER, Vector4.Flatten(verts), gl.STATIC_DRAW );
+    gl.bufferData( gl.ARRAY_BUFFER, Vector4.flatten(verts), gl.STATIC_DRAW );
     
     gl.vertexAttribPointer( this.vertexPosition, 4, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( this.vertexPosition );
@@ -163,7 +163,7 @@ baseRender = function(){
     var vertexNormals = mesh.vertexNormals;
     
     gl.bindBuffer( gl.ARRAY_BUFFER, this.normalsBuffer );
-    gl.bufferData( gl.ARRAY_BUFFER, Vector3.Flatten( vertexNormals ), gl.STATIC_DRAW );
+    gl.bufferData( gl.ARRAY_BUFFER, Vector3.flatten( vertexNormals ), gl.STATIC_DRAW );
 
     gl.vertexAttribPointer( this.vertexNormalPointer, 3, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( this.vertexNormalPointer );
