@@ -24,6 +24,7 @@ class Camera{
         this.viewMat = this.calculateViewMatrix();
         this.orthoOn = false;
         this.nextPos = new Vector4( this.transform.position.x, this.transform.position.y, this.transform.position.z, 1 );
+        this.newRot = new Quat( this.transform.rotation.x, this.transform.rotation.y, this.transform.rotation.z, this.transform.rotation.w );
     }
 
     // aspect = right/top

@@ -107,6 +107,26 @@ class Quat{
     static add( q1, q2 ){
         return new Quat( q1.x + q2.x, q1.y + q2.y, q1.z + q2.z, q1.w + q2.w )
     }
+    
+    /**
+     * straight linear addition of quaternions.
+     * @param {Quat} q1.
+     * @param {Quat} q2.
+     * @returns the added quaternions.
+     */
+    add( q ){
+        return new Quat( this.x + q.x, this.y + q.y, this.z + q.z, this.w + q.w )
+    }
+    
+    /**
+     * straight linear addition of quaternions.
+     * @param {Quat} q1.
+     * @param {Quat} q2.
+     * @returns the added quaternions.
+     */
+    sub( q ){
+        return new Quat( this.x - q.x, this.y - q.y, this.z - q.z, this.w - q.w )
+    }
 
     /**
      * This does the dot product of the inner xyz values.
@@ -149,5 +169,16 @@ class Quat{
      */
     static isEqual( q1, q2 ){
         return ( q1.x == q2.x && q1.y == q2.y && q1.z == q2.z && q1.w == q2.w );
+    }
+
+    /**
+     * Returns the linear interpolation between the two vectors
+     * https://docs.unity3d.com/ScriptReference/Vector3.Lerp.html
+     * @param {Quat} q1
+     * @param {Quat} q2 
+     * @param {number} ratio
+     */
+     static lerp( q1, q2, ratio ){
+        return q1.add( Quat.scale(  q2.sub(q1), ratio ) );
     }
 }

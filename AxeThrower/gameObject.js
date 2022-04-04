@@ -141,20 +141,24 @@ class Transform{
         var speed = 15.0;
         var dotXVal = Vector3.dot( fwd, dirToPoint );
         if ( dotXVal > 1.0 ) dotXVal = 1.0;
+        else if (dotXVal < -1.0 ) dotXVal = -1.0;
         var axis = Vector3.cross( fwd, dirToPoint );
-        var angleX = Math.acos( dotXVal );
+        var angleX = Math.acos( dotXVal ) * 180/Math.PI; // these are converted to degrees
+                                                         // because the quat function expects degrees
         var currRot = this.rotation;
-        currRot = Quat.mult( currRot, Quat.fromAxisAndAngle( axis, -angleX*speed ) );
+        currRot = Quat.mult( currRot, Quat.fromAxisAndAngle( axis, -angleX ) );
 
         this.updateRotation();
         var right = this.rightVec;
         var newRight = Vector3.cross( dirToPoint, new Vector3( 0, 1, 0 ) ).normalized;
         var dotYVal = Vector3.dot( newRight, right );
         if ( dotYVal > 1.0 ) dotYVal = 1.0;
+        else if (dotYVal < -1.0 ) dotYVal = -1.0;
         var sign = 1.0;
         if ( right.y < 0 ) sign = -1.0;
-        var angleY = Math.acos( dotYVal ) * sign;
-        this.rotation = Quat.mult( currRot, Quat.fromAxisAndAngle( dirToPoint, -angleY*speed ) );
+        var angleY = Math.acos( dotYVal ) * 180/Math.PI * sign; // these are converted to degrees
+                                                         // because the quat function expects degrees
+        this.rotation =  Quat.mult( currRot, Quat.fromAxisAndAngle( dirToPoint, -angleY ) );
     }
 
 }
