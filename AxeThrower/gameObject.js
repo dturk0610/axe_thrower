@@ -150,7 +150,7 @@ class Transform{
 
         this.updateRotation();
         var right = this.rightVec;
-        var newRight = Vector3.cross( dirToPoint, new Vector3( 0, 1, 0 ) ).normalized;
+        var newRight = Vector3.cross( this.fwdVec, new Vector3( 0, 1, 0 ) ).normalized;
         var dotYVal = Vector3.dot( newRight, right );
         if ( dotYVal > 1.0 ) dotYVal = 1.0;
         else if (dotYVal < -1.0 ) dotYVal = -1.0;
