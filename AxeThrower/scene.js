@@ -7,6 +7,7 @@ class Scene{
     static MaxDirLights = 5; // This value matches the one in the fragment shader for this
     static MaxPtLights = 10; // This value matches the one in the fragment shader for this
     static useSpecular = true;
+    static currNumLights = 0;
 
     constructor( camera, objects = [] ){
         this.objects = objects;
@@ -24,6 +25,8 @@ class Scene{
 
     static AddDirLight( dirLight ){
         if ( Scene.DirectionalLights.length < Scene.MaxDirLights ){
+            this.currNumLights++;
+            dirLight.base.lightNum = this.currNumLights;
             Scene.DirectionalLights.push( dirLight );
         }
         else { alert("Tried adding too many directional lights!"); }
@@ -35,6 +38,8 @@ class Scene{
 
     static AddPtLight( ptLight ){
         if ( Scene.PointLights.length < Scene.MaxPtLights ){
+            this.currNumLights++;
+            ptLight.base.lightNum = this.currNumLights;
             Scene.PointLights.push( ptLight );
         }
         else { alert("Tried adding too many point lights!"); }
@@ -42,6 +47,23 @@ class Scene{
 
     static GetPtLights(){
         return Scene.PointLights;
+    }
+
+    static toggleLight( num ){
+        var dirLights = Scene.DirectionalLights;
+        for (var i = 0; i < dirLights.length; i++){
+            if (dirLights[i].base.lightNum == num){
+                dirLights[i].base.isOn = !dirLights[i].base.isOn;
+            }
+        }
+        Scene.DirectionalLights = dirLights;
+        var ptLights = Scene.PointLights;
+        for (var i = 0; i < ptLights.length; i++){
+            if (ptLights[i].base.lightNum == num){
+                ptLights[i].base.isOn = !ptLights[i].base.isOn;
+            }
+        }
+        Scene.PointLights = ptLights;
     }
 
     /**

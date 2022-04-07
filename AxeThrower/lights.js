@@ -12,6 +12,8 @@ class BaseLight{
         this.ambient = ambient;
         this.diffuse = diffuse;
         this.specular = specular;
+        this.isOn = true;
+        this.lightNum = 0;
     }
 
 }

@@ -187,7 +187,6 @@ function endClick( canvas, event ){
     }
 }
 
-
 var holdingE = false;
 function onKeyDown(event) {
     var rightVec = myScene.camera.transform.rightVec;
@@ -201,7 +200,13 @@ function onKeyDown(event) {
         case 68: totDir.x += rightVec.x;  totDir.y += rightVec.y;   totDir.z += rightVec.z;   break; // d 
         case 79: Scene.mainCam.orthoOn = !Scene.mainCam.orthoOn; break; // o
         case 76: Scene.ToggleSpec(); break; // l
-        case 69: holdingE = true; break;
+        case 69: holdingE = true; break;// e
+        case 49: Scene.toggleLight(1); break; // 1
+        case 50: Scene.toggleLight(2); break; // 2
+        case 51: Scene.toggleLight(3); break; // 3
+        case 52: Scene.toggleLight(4); break; // 4
+        case 53: Scene.toggleLight(5); break; // 5
+        case 54: Scene.toggleLight(6); break; // 6
     }
 
     if ( totDir.x != 0 || totDir.y != 0 || totDir.z != 0 ){
@@ -209,6 +214,7 @@ function onKeyDown(event) {
         myScene.camera.move( totDir );
     }
 }
+
 function onKeyUp(event) {
     var keyCode = event.keyCode;
     switch (keyCode) {
