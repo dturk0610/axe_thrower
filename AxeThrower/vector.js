@@ -376,7 +376,21 @@ class Vector2{
      * @param {Vector2} u 
      * @returns 
      */
-    static aßdd( v, u ){
+    static add( v, u ){
         return new Vector3( v.x + u.x, v.y + u.y );
+    }
+
+    /**
+     * 
+     * @param {[Vector2]} varr array of vectors to flatten to the GPU.
+     * @returns 
+     */
+    static flatten( varr ){
+        var ret = new Float32Array( varr.length * 2 );
+        for (var i = 0; i < varr.length; i++){
+            ret[i*2 + 0] = varr[i].x;
+            ret[i*2 + 1] = varr[i].y;
+        }
+        return ret;
     }
 }

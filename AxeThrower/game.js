@@ -37,9 +37,8 @@ function setupGL(){
     gl.clearColor( 0.0, 0.0, 0.0, 1.0 );
     MeshRenderer.setGL(gl);
     
-    floorShader = initShaders( gl, "vertex-shader-quad", "fragment-shader" );
-    lightShader = initShaders( gl, "vertex-phrongLighting", "fragment-phrongLighting" );
-    baseShader = initShaders( gl, "vertex-lighting", "fragment-lighting" );
+    baseShader = initShaders( gl, baseVert, baseFrag );
+    baseTextShader = initShaders( gl, baseTextVert, baseTextFrag );
 }
 
 
@@ -111,6 +110,13 @@ function setupScene(){
     var basicMaterial = new Material( baseShader, chair );
     chair.meshRenderer = new MeshRenderer( chair, basicMaterial, baseRenderSetup, baseRender );
     myScene.addObject( chair );
+
+    var dice = new GameObject( "die", new Vector4( 0, 1, -1, 1 ), Quat.identity, new Vector3( .1, .1, .1 ) );
+    dice.mesh = new Mesh( getIcosaVerts(), getIcosaFaces() );
+    var basicTextMaterial = new Material( baseTextShader, dice, new Vector3( 1, 0, 0 ), new Vector3( .8, 0, 0 ), new Vector3( 0, 0, 1 ), 10 );
+    dice.meshRenderer = new MeshRenderer( dice, basicTextMaterial, baseTextRenderSetup, baseTextRender );
+    myScene.addObject( dice );
+
 
 }
 
@@ -207,6 +213,9 @@ function onKeyDown(event) {
         case 52: Scene.toggleLight(4); break; // 4
         case 53: Scene.toggleLight(5); break; // 5
         case 54: Scene.toggleLight(6); break; // 6
+        case 55: var dice = myScene.getObjectWithTag('die'); dice.transform.rotation = Quat.mult( dice.transform.rotation, Quat.fromAxisAndAngle( new Vector3( 1, 0, 0 ), 5.0) ); dice.update(); break; // 7
+        case 56: var dice = myScene.getObjectWithTag('die'); dice.transform.rotation = Quat.mult( dice.transform.rotation, Quat.fromAxisAndAngle( new Vector3( 0, 1, 0 ), 5.0) ); dice.update(); break; // 8
+        case 57: var dice = myScene.getObjectWithTag('die'); dice.transform.rotation = Quat.mult( dice.transform.rotation, Quat.fromAxisAndAngle( new Vector3( 0, 0, 1 ), 5.0) ); dice.update(); break; // 9
     }
 
     if ( totDir.x != 0 || totDir.y != 0 || totDir.z != 0 ){
