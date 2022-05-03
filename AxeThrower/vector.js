@@ -4,9 +4,9 @@ class Vector4{
 
     /**
      * 
-     * @param {number} x 
-     * @param {number} y 
-     * @param {number} z 
+     * @param {float} x 
+     * @param {float} y 
+     * @param {float} z 
      * @param {number} w 
      */
     constructor( x = 0, y = 0, z = 0, w = 1 ){
@@ -113,7 +113,7 @@ class Vector4{
      * @returns 
      */
     static add( v, u ){
-        return new Vector4( v.x + u.x, v.y + u.y, v.z + u.z );
+        return new Vector4( v.x + u.x, v.y + u.y, v.z + u.z, 1 );
     }
 
     /**
@@ -123,7 +123,7 @@ class Vector4{
      * @returns 
      */
     add( v ){
-        return new Vector4( this.x + v.x, this.y + v.y, this.z + v.z );
+        return new Vector4( this.x + v.x, this.y + v.y, this.z + v.z, 1 );
     }
 
     /**
@@ -134,7 +134,7 @@ class Vector4{
      * @returns 
      */
      static sub( v, u ){
-        return new Vector4( v.x - u.x, v.y - u.y, v.z - u.z );
+        return new Vector4( v.x - u.x, v.y - u.y, v.z - u.z, 1 );
     }
 
     /**
@@ -144,7 +144,7 @@ class Vector4{
      * @returns 
      */
      sub( v ){
-        return new Vector4( this.x - v.x, this.y - v.y, this.z - v.z );
+        return new Vector4( this.x - v.x, this.y - v.y, this.z - v.z, 1 );
     }
 
     /**
@@ -164,7 +164,7 @@ class Vector4{
     }
 
     static scale( amount, v ){
-        return new Vector4( v.x*amount, v.y*amount, v.z*amount );
+        return new Vector4( v.x*amount, v.y*amount, v.z*amount, 1 );
     }
 
     /**
@@ -339,6 +339,10 @@ class Vector3{
      */
     static isEqual( v1, v2 ){
         return ( v1.x == v2.x && v1.y == v2.y && v1.z == v2.z );
+    }
+
+    toVector4(){
+        return new Vector4( this.x, this.y, this.z, 1 );
     }
 
     static zero = new Vector3( 0, 0, 0 );

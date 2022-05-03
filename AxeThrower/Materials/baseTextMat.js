@@ -16,13 +16,14 @@ baseTextRenderSetup = function(){
     // Asynchronously load an image
     var image = new Image();
     image.crossOrigin = "";
-    image.src = "/AxeThrower/d20Texture.png";
+    image.src = "d20Texture.png";
     image.addEventListener('load', function() {
       // Now that the image has loaded make copy it to the texture.
       gl.bindTexture( gl.TEXTURE_2D, texture );
       gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image );
       gl.generateMipmap( gl.TEXTURE_2D );
     });
+    allTextures.push(texture);
 
     this.textureLocation = gl.getUniformLocation( this.shaderProgram, "u_texture" );
 
@@ -190,6 +191,11 @@ baseTextRender = function(){
     var verts = mesh.getVertices();
     var indexList = mesh.getFaces();
 
+    gl.activeTexture( gl.TEXTURE0 + currTextureLoaded );
+    gl.bindTexture( gl.TEXTURE_2D, allTextures[currTextureLoaded] );
+    gl.uniform1i( this.textureLocation, currTextureLoaded );
+    currTextureLoaded ++;
+
     gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer );
     gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexList), gl.STATIC_DRAW );
 
@@ -225,8 +231,8 @@ baseTextRender = function(){
 
     var viewMat = cam.viewMat;
     var viewProjectMat = Matrix.mult4x4( projectionMat, viewMat );
-    var worldMat = this.gameObject.worldMat;
-    var worldMatInverse = Matrix.inverseM4x4( this.gameObject.worldMat );
+    var worldMat = this.gameObject.transform.worldMat;
+    var worldMatInverse = Matrix.inverseM4x4( worldMat );
     var worldMatTransposeInverse = Matrix.transpose( worldMatInverse );
 
     gl.uniform3fv( this.viewPosLoc, cam.transform.position.xyz );
@@ -402,7 +408,6 @@ baseTextRender = function(){
     gl.uniform3fv( this.materialSpecLoc, material.specular.rgb );
     gl.uniform1f( this.materialShineLoc, material.shininess );
 
-    gl.uniform1i( this.textureLocation, 0.0 );
 
     gl.drawElements( gl.TRIANGLES, 3 * numTriangles, gl.UNSIGNED_SHORT, 0 );
 }

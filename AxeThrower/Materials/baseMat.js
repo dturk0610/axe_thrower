@@ -195,8 +195,8 @@ baseRender = function(){
 
     var viewMat = cam.viewMat;
     var viewProjectMat = Matrix.mult4x4( projectionMat, viewMat );
-    var worldMat = this.gameObject.worldMat;
-    var worldMatInverse = Matrix.inverseM4x4( this.gameObject.worldMat );
+    var worldMat = this.gameObject.transform.worldMat;
+    var worldMatInverse = Matrix.inverseM4x4( worldMat );
     var worldMatTransposeInverse = Matrix.transpose( worldMatInverse );
 
     gl.uniform3fv( this.viewPosLoc, cam.transform.position.xyz );

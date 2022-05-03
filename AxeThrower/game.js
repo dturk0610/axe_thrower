@@ -6,6 +6,9 @@ var pastTime;
 var floorShader, lightShader;
 var baseShader;
 
+var allTextures = [];
+var currTextureLoaded = 0;
+
 function init(){
     var canvas = document.getElementById( "gl-canvas" );
     
@@ -31,7 +34,7 @@ function init(){
 };
 
 function setupGL(){
-    gl.enable(gl.CULL_FACE);
+    //gl.enable(gl.CULL_FACE);
     gl.enable(gl.DEPTH_TEST);
     gl.viewport( 0, 0, w, h );
     gl.clearColor( 0.0, 0.0, 0.0, 1.0 );
@@ -105,13 +108,31 @@ function setupScene(){
     myScene.addObject( wall4 );
 
 
-    var chair = new GameObject( "chair", new Vector4( 0, .45, -4, 1 ), Quat.identity, new Vector3( .02, .02, .02 ) );
-    chair.mesh = new Mesh( getChairVertices(), getChairFaces() );
-    var basicMaterial = new Material( baseShader, chair );
-    chair.meshRenderer = new MeshRenderer( chair, basicMaterial, baseRenderSetup, baseRender );
-    myScene.addObject( chair );
+    // var chair = new GameObject( "chair", new Vector4( 0, .45, -4, 1 ), Quat.identity, new Vector3( .02, .02, .02 ) );
+    // chair.mesh = new Mesh( getChairVertices(), getChairFaces() );
+    // var basicMaterial = new Material( baseShader, chair );
+    // chair.meshRenderer = new MeshRenderer( chair, basicMaterial, baseRenderSetup, baseRender );
+    // myScene.addObject( chair );
 
-    var dice = new GameObject( "die", new Vector4( 0, 1, -1, 1 ), Quat.identity, new Vector3( .1, .1, .1 ) );
+    var targetOBJs = OBJ.gameObjectFromOBJ("Models/target.obj");
+    targetOBJs[1].transform.scale = new Vector3( 1, 1, 1 );
+    targetOBJs[1].transform.position = new Vector4( 0.0, 1.0, -3.0, 1 );
+    targetOBJs[1].transform.rotation = Quat.fromAxisAndAngle( new Vector3( 1, 0, 0 ), 180.0 );
+    targetOBJs.forEach( targetOBJ => { myScene.addObject( targetOBJ ); });
+
+
+    var axeOBJs = OBJ.gameObjectFromOBJ("Models/axe.obj");
+    axeOBJs[0].transform.scale = new Vector3( .05, .05, .05 );
+    axeOBJs[0].transform.position = new Vector4( -1.0, 1.0, -3.0, 1 );
+    axeOBJs[0].transform.rotation = Quat.fromAxisAndAngle( new Vector3( 1, 0, 0 ), -90.0 );
+    axeOBJs.forEach( axeOBJ => { myScene.addObject( axeOBJ ); });
+
+    var deskObjs = OBJ.gameObjectFromOBJ("Models/Desk.obj");
+    deskObjs[0].transform.scale = new Vector3( .005, .005, .005 );
+    deskObjs[0].transform.position = new Vector4( 0, .2, 0, 1 );
+    deskObjs.forEach( deskObj => { myScene.addObject(deskObj) } );
+
+    var dice = new GameObject( "die", new Vector4( 1.0, 1.0, -3.0, 1 ), Quat.identity, new Vector3( .1, .1, .1 ) );
     dice.mesh = new Mesh( getIcosaVerts(), getIcosaFaces() );
     var basicTextMaterial = new Material( baseTextShader, dice, new Vector3( 1, 0, 0 ), new Vector3( .8, 0, 0 ), new Vector3( 0, 0, 1 ), 10 );
     dice.meshRenderer = new MeshRenderer( dice, basicTextMaterial, baseTextRenderSetup, baseTextRender );
@@ -129,6 +150,7 @@ function drawScene( now ){
 
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
 
+    currTextureLoaded = 0;
     myScene.objects.forEach( obj => {
         if (obj.meshRenderer !== undefined){
             obj.meshRenderer.render();
@@ -137,10 +159,7 @@ function drawScene( now ){
 
 
     cam.update( timeDelta );
-    if (holdingE){ 
-        var chairObj = myScene.getObjectWithTag( "chair" );
-        Scene.mainCam.lookAt( chairObj.transform.position );
-    }
+    myScene.update();
 
 
     pastTime = now;

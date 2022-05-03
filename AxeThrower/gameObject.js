@@ -28,7 +28,6 @@ class GameObject{
     constructor( tag = "new game object", position = new Vector4( 0, 0, 0, 1 ), rotation = new Quat( 0, 0, 0, 1 ), scale = new Vector3( 1, 1, 1 ) ){
         this.tag = tag;
         this.transform = new Transform( position, rotation, scale );
-        this.worldMat = this.calcWorldMat();
     }
 
 
@@ -42,8 +41,7 @@ class GameObject{
     }
 
     update(){
-        this.worldMat = this.calcWorldMat();
-        this.transform.updateRotation();
+        this.transform.update();
     }
 
 }
@@ -108,6 +106,7 @@ class Transform{
             this.upVec = new Vector3( 0, 1, 0 );
             this.fwdVec = new Vector3( 0, 0, -1 );
         }
+        this.worldMat = this.calcWorldMat();
     }
 
     updateRotation(){
@@ -132,6 +131,10 @@ class Transform{
             this.position.x, this.position.y, this.position.z, 1.0 
         ];
         var scaleRotMat = Matrix.mult4x4( rotMat, scaleMat );
+        if ( this.parent ){
+            var thisMat = Matrix.mult4x4( moveMat, scaleRotMat );
+            return Matrix.mult4x4( this.parent.worldMat, thisMat );
+        }
         return Matrix.mult4x4( moveMat, scaleRotMat );
     }
 
@@ -161,6 +164,19 @@ class Transform{
         this.rotation =  Quat.mult( currRot, Quat.fromAxisAndAngle( dirToPoint, -angleY ) );
     }
 
+    update(){
+        this.worldMat = this.calcWorldMat();
+        this.updateRotation();
+    }
+
+    setParent( par ){
+        if ( par.children == null ) par.children = [];
+        par.children.push( this );
+        this.parent = par;
+        var parScale = par.scale;
+        this.scale = new Vector3( this.scale.x/parScale.x, this.scale.y/parScale.y, this.scale.z/parScale.z );
+    }
+
 }
 
 /**
@@ -174,13 +190,16 @@ class Mesh{
      * @param {*} verts 
      * @param {*} indices 
      */
-    constructor(  verts = [], indices = [] ){
+    constructor(  verts = [], indices = [], norms = null ){
         this.verts = verts;
         this.numVertices = verts.length;
         this.indices = indices;
         this.numTriangles = indices.length/3;
         this.faceNormals = this.getFaceNormals();
-        this.vertexNormals = this.getVertexNormals();
+        if ( norms  == null )
+            this.vertexNormals = this.getVertexNormals();
+        else
+            this.vertexNormals = norms;
     }
   
     /**
@@ -285,14 +304,17 @@ class MeshRenderer{
 
     static setGL ( gl ) { MeshRenderer.gl = gl; };
 
-    constructor( gameObj, material, renderSetup, render ){
+    constructor( gameObj, material, renderSetup, render, textCoords = null, textImg = null ){
         this.gameObject = gameObj;
         this.material = material;
         this.shaderProgram = this.material.shaderProgram;
         this.setupFunc = renderSetup;
         this.renderFunc = render;
         this.gl = MeshRenderer.gl;
-        this.setupFunc();
+        if ( textCoords == null) 
+            this.setupFunc();
+        else
+            this.setupFunc( textCoords, textImg );
     }
 
     render(){
