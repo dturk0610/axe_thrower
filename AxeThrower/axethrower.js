@@ -64,6 +64,12 @@ class Thrower{
             var indToDelete = myScene.objects.findIndex( elem => typeof (elem.sceneNum) !== undefined && elem.sceneNum == this.sceneNum );
             myScene.objects.splice( indToDelete, 1 );
             delete this;
+
+            const impactAudio = document.getElementById("impact");
+            const newAudio = impactAudio.cloneNode();
+            newAudio.volume = 1;
+            newAudio.currentTime = .27;
+            newAudio.play()
         }
     }
 
@@ -110,6 +116,12 @@ function pickUpDropClosestAxe(){
         axeBeingHeld = wantedAxe;
         startQuat = axeBeingHeld.transform.rotation;
         holdingAxe = true;
+
+        const pickupAudio = document.getElementById("axePickup");
+        const newAudio = pickupAudio.cloneNode();
+        newAudio.volume = .1;
+        newAudio.play()
+
         return true;
     }else{
         stopThrow();
