@@ -58,7 +58,7 @@ class OBJ{
                                 }
                             default:
                                 subInds.push( ind, ind + 1, ind + 2 );
-                                ind += 3;
+                                ind = ind + 3;
                                 break;
                         }
                     }
@@ -111,7 +111,7 @@ class OBJ{
                 case "vn":
                     lineParse.shift();
                     if ( norms == null ) norms = [];
-                    norms.push( new Vector3( lineParse[0], lineParse[1], lineParse[2] ) );
+                    norms.push( new Vector3( parseFloat(lineParse[0]), parseFloat(lineParse[1]), parseFloat(lineParse[2]) ) );
                     break;
                 case "f":
                     lineParse.shift();
@@ -124,7 +124,6 @@ class OBJ{
                             case 1: face.push( [ parseInt(ints[0]) - 1 ] ); break;
                         }
                     });
-                    faces.push( face );
                     if ( objs[currObj].faces == null ) objs[currObj].faces = [];
                     objs[currObj].faces.push( face );
                     break;
@@ -162,7 +161,6 @@ class OBJ{
         //console.log( textVerts );
         //console.log( faces );
         //console.log(norms);
-        //console.log(objs);
         //console.log(Object.keys(objs).length);
         return OBJ.buildGOFromOBJ( tag, verts, textVerts, objs, norms, mat );
     }

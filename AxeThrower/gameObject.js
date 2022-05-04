@@ -215,8 +215,9 @@ class Mesh{
         this.faceNormals = this.getFaceNormals();
         if ( norms  == null )
             this.vertexNormals = this.getVertexNormals();
-        else
+        else{
             this.vertexNormals = norms;
+        }
     }
   
     /**
