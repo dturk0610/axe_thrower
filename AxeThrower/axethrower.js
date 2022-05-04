@@ -37,7 +37,7 @@ function throwAxe(){
     axeBeingThrown = axeBeingHeld;
     axeBeingHeld = null;
     var newThrower = new Thrower( vertsToFollow, axeBeingThrown, rightVec );
-    myScene.addObject(newThrower);
+    myScene.addObject( newThrower );
     tryDestoryLine();
 }
 
@@ -52,7 +52,6 @@ class Thrower{
         this.vertInd = 0;
         this.sceneNum = Thrower.numInScene % 3;
         Thrower.numInScene += 1
-        this.update = this.update;
     }
 
     update(){
@@ -99,7 +98,7 @@ function pickUpDropClosestAxe(){
             }
         });
         if ( prevDist > 1.5 ) wantedAxe = null;
-        if ( wantedAxe == null ) return;
+        if ( wantedAxe == null ) return false;
         prevPos = wantedAxe.transform.position;
         prevRot = wantedAxe.transform.rotation;
         prevScale = wantedAxe.transform.scale;
@@ -111,8 +110,10 @@ function pickUpDropClosestAxe(){
         axeBeingHeld = wantedAxe;
         startQuat = axeBeingHeld.transform.rotation;
         holdingAxe = true;
+        return true;
     }else{
         stopThrow();
+        return true;
     }
 }
 

@@ -16,6 +16,13 @@ class Quat{
     }
 
     /**
+     * @returns the magnitude of the current vector
+     */
+     get magnitude(){
+        return Math.sqrt( this.x*this.x + this.y*this.y + this.z*this.z + this.w*this.w );
+    }
+
+    /**
      * Rebuilds the current quaternion so that its new axis and angle are the ones entered
      * @param {Vector3} axis axis to rotate around
      * @param {number} angle angle in degress to rotate around by
@@ -116,6 +123,16 @@ class Quat{
      */
     add( q ){
         return new Quat( this.x + q.x, this.y + q.y, this.z + q.z, this.w + q.w )
+    }
+    
+    /**
+     * straight linear addition of quaternions.
+     * @param {Quat} q1.
+     * @param {Quat} q2.
+     * @returns the added quaternions.
+     */
+    static sub( q1, q2 ){
+        return new Quat( q1.x - q2.x, q1.y - q2.y, q1.z - q2.z, q1.w - q2.w )
     }
     
     /**

@@ -145,7 +145,7 @@ function setupScene(){
     deskObjs[0].transform.rotation = Quat.fromAxisAndAngle( new Vector3( 0, 1, 0 ), 90 );
     deskObjs.forEach( deskObj => { myScene.addObject(deskObj) } );
 
-    var dice = new GameObject( "die", new Vector4( 1.0, 1.0, -3.0, 1 ), Quat.identity, new Vector3( .1, .1, .1 ) );
+    var dice = new GameObject( "die", new Vector4( 2, .54, -.5, 1), Quat.identity, new Vector3( .02, .02, .02 ) );
     dice.mesh = new Mesh( getIcosaVerts(), getIcosaFaces() );
     var basicTextMaterial = new Material( baseTextShader, dice, new Vector3( 1, 0, 0 ), new Vector3( .8, 0, 0 ), new Vector3( 0, 0, 1 ), 10 );
     dice.meshRenderer = new MeshRenderer( dice, basicTextMaterial, baseTextRenderSetup, baseTextRender );
@@ -245,7 +245,7 @@ function onKeyDown(event) {
         case 68: totDir.x += rightVec.x;  totDir.y += rightVec.y;   totDir.z += rightVec.z;   break; // d 
         case 79: Scene.mainCam.orthoOn = !Scene.mainCam.orthoOn; break; // o
         case 76: Scene.ToggleSpec(); break; // l
-        case 69: pickUpDropClosestAxe(); break;// e
+        case 69: if ( !pickUpDropClosestAxe() ) { RollDice(); } break;// e
         case 32: holdingSpace = true; break;
         case 49: Scene.toggleLight(1); break; // 1
         case 50: Scene.toggleLight(2); break; // 2
@@ -262,6 +262,14 @@ function onKeyDown(event) {
         totDir = totDir.normalized;
         myScene.camera.move( totDir );
     }
+}
+
+function RollDice(){
+    var dice = myScene.getObjectWithTag('die');
+    var dist = Vector4.sub( dice.transform.position, Scene.mainCam.transform.position ).magnitude;
+    if ( dist > 1.5 ) return false;
+    var diceRoller = new DiceRoller( dice );
+    myScene.addObject( diceRoller );
 }
 
 function onKeyUp(event) {
