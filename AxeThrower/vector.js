@@ -133,7 +133,7 @@ class Vector4{
      * @param {Vector4} u 
      * @returns 
      */
-     static sub( v, u ){
+    static sub( v, u ){
         return new Vector4( v.x - u.x, v.y - u.y, v.z - u.z, 1 );
     }
 
@@ -143,7 +143,7 @@ class Vector4{
      * @param {Vector4} v 
      * @returns 
      */
-     sub( v ){
+    sub( v ){
         return new Vector4( this.x - v.x, this.y - v.y, this.z - v.z, 1 );
     }
 
@@ -256,6 +256,15 @@ class Vector3{
 
     /**
      * 
+     * @param {Vector3} v
+     * @returns 
+     */
+    dot( v ){
+        return ( this.x*v.x + this.y*v.y + this.z*v.z );
+    }
+
+    /**
+     * 
      * @param {Vector3} v 
      * @param {Vector3} u 
      * @returns 
@@ -269,7 +278,7 @@ class Vector3{
      * @param {Vector3} v 
      * @returns 
      */
-    Add( v ){
+    add( v ){
         return new Vector3( this.x + v.x, this.y + v.y, this.z + v.z );
     }
 
@@ -279,7 +288,8 @@ class Vector3{
      * @param {Vector3} u 
      * @returns 
      */
-     static sub( v, u ){
+    
+    static sub( v, u ){
         return new Vector3( v.x - u.x, v.y - u.y, v.z - u.z );
     }
 
@@ -288,8 +298,13 @@ class Vector3{
      * @param {Vector3} v 
      * @returns 
      */
-     sub( v ){
+    sub( v ){
         return new Vector3( this.x - v.x, this.y - v.y, this.z - v.z );
+    }
+    
+
+    static scale( amount, v ){
+        return new Vector3( v.x*amount, v.y*amount, v.z*amount );
     }
 
     /**

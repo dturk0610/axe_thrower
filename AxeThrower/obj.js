@@ -17,8 +17,11 @@ class OBJ{
         for ( var i = 0; i < verts.length; i++ ){ 
             verts[i] = verts[i].sub( midPoint ); 
         }
-
-        if ( objsKeys.length == 1 ) tag = objs[objsKeys[0]].tag;
+        var isWholeObj = false;
+        if ( objsKeys.length == 1 ){ 
+            tag = objs[objsKeys[0]].tag;
+            isWholeObj = true;
+        }
         var parentObj = new GameObject( "Parent " + tag, new Vector4( 0, 0, 0, 1 ), Quat.identity, new Vector3( 1, 1, 1 ) );
         retObjs.push(parentObj);
 
@@ -40,11 +43,11 @@ class OBJ{
                         var faceVal1 = currFace[0], faceVal2 = currFace[i + 1], faceVal3 = currFace[i + 2];
                         switch ( numInfo ){
                             case 3:
-                                subNorms.push( norms[faceVal1[2] - 1], norms[faceVal2[2] - 1], norms[faceVal3[2] - 1] );
+                                subNorms.push( norms[faceVal1[2]], norms[faceVal2[2]], norms[faceVal3[2]] );
                             case 2:
-                                subTextCoords.push( textVerts[faceVal1[1] - 1], textVerts[faceVal2[1] - 1], textVerts[faceVal3[1] - 1] );
+                                subTextCoords.push( textVerts[faceVal1[1]], textVerts[faceVal2[1]], textVerts[faceVal3[1]] );
                             case 1:
-                                var vert1 = verts[faceVal1[0] - 1], vert2 = verts[faceVal2[0] - 1], vert3 = verts[faceVal3[0] - 1];
+                                var vert1 = verts[faceVal1[0]], vert2 = verts[faceVal2[0]], vert3 = verts[faceVal3[0]];
                                 subVerts.push( vert1, vert2, vert3 );
                                 if ( !cameWithNorms ){
                                     var v = new Vector3( vert1.x, vert1.y, vert1.z );
@@ -54,11 +57,11 @@ class OBJ{
                                     subNorms.push( n );
                                 }
                             default:
-                                subInds.push( ind, ind + i + 1, ind + i + 2 );
+                                subInds.push( ind, ind + 1, ind + 2 );
+                                ind += 3;
                                 break;
                         }
                     }
-                    ind += currFace.length;
                 }
             });
             newGO.mesh = new Mesh( subVerts, subInds, subNorms );
@@ -116,9 +119,9 @@ class OBJ{
                     lineParse.forEach(element => {
                         var ints = element.split("/");
                         switch ( ints.length ){
-                            case 3: face.push( [ parseInt(ints[0]), parseInt(ints[1]), parseInt(ints[2]) ] ); break;
-                            case 2: face.push( [ parseInt(ints[0]), parseInt(ints[1]) ] ); break;
-                            case 1: face.push( [ parseInt(ints[0]) ] ); break;
+                            case 3: face.push( [ parseInt(ints[0]) - 1, parseInt(ints[1]) - 1, parseInt(ints[2]) - 1 ] ); break;
+                            case 2: face.push( [ parseInt(ints[0]) - 1, parseInt(ints[1]) - 1 ] ); break;
+                            case 1: face.push( [ parseInt(ints[0]) - 1 ] ); break;
                         }
                     });
                     faces.push( face );

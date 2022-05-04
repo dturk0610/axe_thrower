@@ -406,6 +406,7 @@ objTextRender = function(){
     gl.uniform3fv( this.materialSpecLoc, material.specular.rgb );
     gl.uniform1f( this.materialShineLoc, material.shininess );
 
+    //gl.drawElements( gl.TRIANGLES, 3 * numTriangles, gl.UNSIGNED_SHORT, 0 );
     gl.drawArrays( gl.TRIANGLES, 0, 3 * numTriangles);
 }
 

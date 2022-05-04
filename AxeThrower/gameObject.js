@@ -74,9 +74,22 @@ class Quad{
                          0, 2, 3 ];
         this.depth = depth;
         this.width = width;
-        var gO = new GameObject( "new Quad", position, rotation, scale , this.verts, this.indices );
-        gO.mesh = new Mesh( verts, indexList )
+        var gO = new GameObject( "Quad", position, rotation, scale , this.verts, this.indices );
+        gO.mesh = new Mesh( verts, indexList );
+        gO.quad = this;
+        this.gameObject = gO;
         return gO;
+    }
+
+    whereRayIntersects( rayPoint, rayDir ){
+        var quadNorm = this.gameObject.transform.upVec.normalized;
+        var rayNorm = rayDir.normalized;
+        if ( quadNorm.dot(rayNorm) >= -.00002 ) {
+            return null;
+        }
+    
+        var t = ( quadNorm.dot( this.gameObject.transform.position.toVector3() ) - quadNorm.dot( rayPoint.toVector3() ) )/quadNorm.dot( rayNorm ) ;
+        return rayPoint.add( Vector3.scale( t, rayNorm ) );
     }
 }
 
@@ -107,6 +120,10 @@ class Transform{
             this.fwdVec = new Vector3( 0, 0, -1 );
         }
         this.worldMat = this.calcWorldMat();
+    }
+
+    get worldPosition(){
+        return Matrix.vecMatMult( this.position, this.worldMat );
     }
 
     updateRotation(){

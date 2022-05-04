@@ -88,10 +88,14 @@ class Camera{
     update( timeDelta ){
         
         var lerpSpeed = 5.0;
+        if ( this.nextPos.x >= 5 ) this.nextPos.x = 4.85;
+        else if ( this.nextPos.x <= -5 ) this.nextPos.x = -4.85;
+        if ( this.nextPos.z >= 5 ) this.nextPos.z = 4.85;
+        else if ( this.nextPos.z <= -5 ) this.nextPos.z = -4.85;
         var lerpPos = Vector4.lerp( this.transform.position, this.nextPos, timeDelta*lerpSpeed );
         this.transform.position = lerpPos;
 
-        this.transform.updateRotation();
+        this.transform.update();
         this.cameraToWorldMatrix = this.calculateCameraMatrix();
         this.viewMat = this.calculateViewMatrix();
     }

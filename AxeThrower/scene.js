@@ -76,6 +76,16 @@ class Scene{
             var currObj = this.objects[i];
             if ( currObj.tag == tag ) return currObj;
         }
+        return null;
+    }
+
+    getObjectsWithTag( tag ){
+        var ret = [];
+        for (var i = 0; i < this.objects.length; i++){
+            var currObj = this.objects[i];
+            if ( currObj.tag == tag ) ret.push(currObj);
+        }
+        return ret;
     }
 
     addObject( obj ){

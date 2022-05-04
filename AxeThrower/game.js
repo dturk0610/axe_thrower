@@ -42,6 +42,7 @@ function setupGL(){
     
     baseShader = initShaders( gl, baseVert, baseFrag );
     baseTextShader = initShaders( gl, baseTextVert, baseTextFrag );
+    lineShader = initShaders( gl, lineVertShader, lineFragShader );
 }
 
 
@@ -108,28 +109,40 @@ function setupScene(){
     myScene.addObject( wall4 );
 
 
-    // var chair = new GameObject( "chair", new Vector4( 0, .45, -4, 1 ), Quat.identity, new Vector3( .02, .02, .02 ) );
-    // chair.mesh = new Mesh( getChairVertices(), getChairFaces() );
-    // var basicMaterial = new Material( baseShader, chair );
-    // chair.meshRenderer = new MeshRenderer( chair, basicMaterial, baseRenderSetup, baseRender );
-    // myScene.addObject( chair );
+    var chair = new GameObject( "chair", new Vector4( -4, .3, -4, 1 ), Quat.fromAxisAndAngle( new Vector3( 0, 1, 0), -45 ), new Vector3( .01, .01, .01 ) );
+    chair.mesh = new Mesh( getChairVertices(), getChairFaces() );
+    var basicMaterial = new Material( baseShader, chair );
+    chair.meshRenderer = new MeshRenderer( chair, basicMaterial, baseRenderSetup, baseRender );
+    myScene.addObject( chair );
 
     var targetOBJs = OBJ.gameObjectFromOBJ("Models/target.obj");
-    targetOBJs[1].transform.scale = new Vector3( 1, 1, 1 );
-    targetOBJs[1].transform.position = new Vector4( 0.0, 1.0, -3.0, 1 );
+    targetOBJs[1].transform.scale = new Vector3( .01, .01, .01 );
+    targetOBJs[1].transform.position = new Vector4( 0.0, 1.0, -5.0, 1 );
     targetOBJs[1].transform.rotation = Quat.fromAxisAndAngle( new Vector3( 1, 0, 0 ), 180.0 );
     targetOBJs.forEach( targetOBJ => { myScene.addObject( targetOBJ ); });
 
 
     var axeOBJs = OBJ.gameObjectFromOBJ("Models/axe.obj");
-    axeOBJs[0].transform.scale = new Vector3( .05, .05, .05 );
-    axeOBJs[0].transform.position = new Vector4( -1.0, 1.0, -3.0, 1 );
-    axeOBJs[0].transform.rotation = Quat.fromAxisAndAngle( new Vector3( 1, 0, 0 ), -90.0 );
+    axeOBJs[0].transform.scale = new Vector3( .01, .01, .01 );
+    axeOBJs[0].transform.position = new Vector4( 1.6, .51, .4, 1 );
+    axeOBJs[0].transform.rotation = Quat.fromAxisAndAngle( new Vector3( 0, 1, 0 ), 30.0 );
+    axeOBJs.forEach( axeOBJ => { myScene.addObject( axeOBJ ); });
+    
+    var axeOBJs = OBJ.gameObjectFromOBJ("Models/axe.obj");
+    axeOBJs[0].transform.scale = new Vector3( .01, .01, .01 );
+    axeOBJs[0].transform.position = new Vector4( 1.5, .51, 0, 1 );
+    axeOBJs.forEach( axeOBJ => { myScene.addObject( axeOBJ ); });
+    
+    var axeOBJs = OBJ.gameObjectFromOBJ("Models/axe.obj");
+    axeOBJs[0].transform.scale = new Vector3( .01, .01, .01 );
+    axeOBJs[0].transform.position = new Vector4( 1.7, .51, -.2, 1 );
+    axeOBJs[0].transform.rotation = Quat.fromAxisAndAngle( new Vector3( 0, 1, 0 ), 74.0 );
     axeOBJs.forEach( axeOBJ => { myScene.addObject( axeOBJ ); });
 
     var deskObjs = OBJ.gameObjectFromOBJ("Models/Desk.obj");
     deskObjs[0].transform.scale = new Vector3( .005, .005, .005 );
-    deskObjs[0].transform.position = new Vector4( 0, .2, 0, 1 );
+    deskObjs[0].transform.position = new Vector4( 2, .2, 0, 1 );
+    deskObjs[0].transform.rotation = Quat.fromAxisAndAngle( new Vector3( 0, 1, 0 ), 90 );
     deskObjs.forEach( deskObj => { myScene.addObject(deskObj) } );
 
     var dice = new GameObject( "die", new Vector4( 1.0, 1.0, -3.0, 1 ), Quat.identity, new Vector3( .1, .1, .1 ) );
@@ -152,15 +165,19 @@ function drawScene( now ){
 
     currTextureLoaded = 0;
     myScene.objects.forEach( obj => {
-        if (obj.meshRenderer !== undefined){
+        if ( obj.meshRenderer !== undefined ){
             obj.meshRenderer.render();
-        }        
+        }
+        if ( obj.lineRenderer !== undefined ){
+            obj.lineRenderer.render();
+        }
     });
 
 
     cam.update( timeDelta );
     myScene.update();
 
+    if ( holdingSpace ) drawLine();
 
     pastTime = now;
     requestAnimationFrame(drawScene);
@@ -193,12 +210,14 @@ function mouseMove( canvas, event ){
         var currRight = cam.transform.rightVec;
         var xRotAmountMat = Quat.fromAxisAndAngle( currRight, -turnAmount*yDiff );
         currRot = Quat.mult( currRot, xRotAmountMat );
+        cam.transform.rotation = currRot;
+        cam.transform.updateRotation();
+        currRot = cam.transform.rotation;
         var yRotAmountMat = Quat.fromAxisAndAngle( new Vector3( 0, 1, 0 ), turnAmount*xDiff );
         currRot = Quat.mult( currRot, yRotAmountMat );
-
         cam.transform.rotation = currRot;
+        cam.transform.updateRotation();
 
-        //cam.update();
         mouseDownPos = new Vector2( x, y );
     }
 }
@@ -212,7 +231,12 @@ function endClick( canvas, event ){
     }
 }
 
-var holdingE = false;
+var holdingSpace = false;
+var holdingAxe = false;
+var axeBeingHeld = null;
+var prevPos = new Vector4( 0, 0, 0, 1 );
+var prevRot = new Quat( 0, 0, 0, 1 );
+var prevScale = new Vector3( 1, 1, 1 );
 function onKeyDown(event) {
     var rightVec = myScene.camera.transform.rightVec;
     var fwdVec = myScene.camera.transform.fwdVec; // To actually move forward we need the negative of this
@@ -225,7 +249,40 @@ function onKeyDown(event) {
         case 68: totDir.x += rightVec.x;  totDir.y += rightVec.y;   totDir.z += rightVec.z;   break; // d 
         case 79: Scene.mainCam.orthoOn = !Scene.mainCam.orthoOn; break; // o
         case 76: Scene.ToggleSpec(); break; // l
-        case 69: holdingE = true; break;// e
+        case 69: 
+            if (!holdingAxe){
+                var allAxes = myScene.getObjectsWithTag("Parent Axe");
+                var wantedAxe = allAxes[0];
+                var prevDist = Vector4.sub( wantedAxe.transform.position, myScene.camera.transform.position ).magnitude;
+                allAxes.forEach( axe => {
+                    var currDist = Vector4.sub( axe.transform.position, myScene.camera.transform.position ).magnitude
+                    if (  currDist < prevDist ){
+                        wantedAxe = axe;
+                        prevDist = currDist;
+                    }
+                });
+                if ( prevDist > 1.3 ) wantedAxe = null;
+                if ( wantedAxe == null ) break;
+                prevPos = wantedAxe.transform.position;
+                prevRot = wantedAxe.transform.rotation;
+                prevScale = wantedAxe.transform.scale;
+                wantedAxe.transform.setParent(myScene.camera.transform);
+                var uprightQuat = Quat.fromAxisAndAngle( new Vector3( 1, 0, 0 ), -90 );
+                var fwdQuat = Quat.fromAxisAndAngle( new Vector3( 0, 1, 0 ), -90 );
+                wantedAxe.transform.rotation = Quat.mult( uprightQuat, fwdQuat );
+                wantedAxe.transform.position = new Vector4( .2, -.05, -.25, 1);
+                axeBeingHeld = wantedAxe;
+                holdingAxe = true; 
+            }else{
+                axeBeingHeld.transform.position = prevPos;
+                axeBeingHeld.transform.rotation = prevRot;
+                axeBeingHeld.transform.scale = prevScale;
+                delete axeBeingHeld.transform.parent;
+                holdingAxe = false;
+                tryDestoryLine();
+            }
+            break;// e
+        case 32: holdingSpace = true; break;
         case 49: Scene.toggleLight(1); break; // 1
         case 50: Scene.toggleLight(2); break; // 2
         case 51: Scene.toggleLight(3); break; // 3
@@ -243,9 +300,83 @@ function onKeyDown(event) {
     }
 }
 
+var lineExists = false;
+function drawLine(){
+    if ( !holdingAxe ) return;
+    if ( !lineExists ){
+        var fwd = Scene.mainCam.transform.fwdVec;
+        var up = Scene.mainCam.transform.upVec;
+        var points = calculateThrowPoints();
+        if ( points.length == 0 ) { tryDestoryLine(); return; }
+        var p0 = points[0];//new Vector4( 0, 0, 0, 1);
+        var p1 = points[1];//Vector4.add( p0, Vector4.add( Vector4.scale( 1, fwd ), Vector4.scale( .5, up ) ) );
+        var p2 = points[2];//Vector4.add( p0, Vector4.add( Vector4.scale( 2, fwd ), Vector4.scale( .5, up ) ) );
+        var p3 = points[3];//Vector4.add( p0, Vector4.scale( 3, fwd ) );
+        var testObj = new GameObject( "Line", axeBeingHeld.transform.worldPosition, Quat.identity, new Vector3( 1, 1, 1 ) );
+        var lineRender = new LineRenderer( p0, p1, p2, p3, lineShader, testObj );
+        testObj.lineRenderer = lineRender;
+        myScene.addObject(testObj);
+        lineExists = true;
+    }
+    else{
+        var fwd = Scene.mainCam.transform.fwdVec;
+        var up = Scene.mainCam.transform.upVec;
+        var points = calculateThrowPoints();
+        if ( points.length == 0 ){ tryDestoryLine(); return; }
+        var p0 = points[0];//new Vector4( 0, 0, 0, 1);
+        var p1 = points[1];//Vector4.add( p0, Vector4.add( Vector4.scale( 1, fwd ), Vector4.scale( .5, up ) ) );
+        var p2 = points[2];//Vector4.add( p0, Vector4.add( Vector4.scale( 2, fwd ), Vector4.scale( .5, up ) ) );
+        var p3 = points[3];//Vector4.add( p0, Vector4.scale( 3, fwd ) );
+        var lineObj = myScene.getObjectWithTag("Line");
+        lineObj.lineRenderer.updateCPs( p0, p1, p2, p3 );
+        lineObj.transform.position = axeBeingHeld.transform.worldPosition;
+    }
+}
+
+function calculateThrowPoints(){
+    var camPos = Scene.mainCam.transform.position;
+    var rayDir = Scene.mainCam.transform.fwdVec.normalized;
+    var allQuads = myScene.getObjectsWithTag("Quad");
+    var bestWall = allQuads[0];
+    var pointOnWall = null;
+    allQuads.forEach( go => {
+        var thisQuad = go.quad;
+        var pointOnPlane = thisQuad.whereRayIntersects( camPos, rayDir );
+        if ( pointOnPlane != null ) {
+            var reprojectPointOnQuad = Matrix.vecMatMult( pointOnPlane, Matrix.inverseM4x4( go.transform.worldMat ) );
+            if ( Math.abs( reprojectPointOnQuad.x ) < thisQuad.width*.5 && Math.abs( reprojectPointOnQuad.z ) < thisQuad.depth*.5 ){
+                bestWall = go;
+                pointOnWall = pointOnPlane;
+            }
+        }
+    });
+    if ( pointOnWall != null ){
+        var diff = Vector4.sub( pointOnWall, axeBeingHeld.transform.worldPosition);
+        var dist = diff.magnitude;
+        var dir = diff.normalized;
+        var up = Scene.mainCam.transform.upVec;
+        var increase = dist/3;
+        var p0 = new Vector4( 0, 0, 0, 1);
+        var p1 = Vector4.add( Vector4.add( p0, Vector4.scale(   increase, dir ) ), Vector4.scale( 1, up ) );
+        var p2 = Vector4.add( Vector4.add( p0, Vector4.scale( 2*increase, dir ) ), Vector4.scale( 1, up ) );
+        var p3 = diff;
+        return [ p0, p1, p2, p3 ];
+    }
+    return [];
+}
+
+function tryDestoryLine(){
+    if ( myScene.getObjectWithTag( "Line" ) != null ){
+        var lineInd = myScene.objects.indexOf( obj => obj.tag == "Line" );
+        myScene.objects.splice( lineInd );
+        lineExists = false;
+    }
+}
+
 function onKeyUp(event) {
     var keyCode = event.keyCode;
     switch (keyCode) {
         case 69: holdingE = false; break;
+        case 32: holdingSpace = false; tryDestoryLine(); break;
     }
 }
