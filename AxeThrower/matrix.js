@@ -170,13 +170,45 @@ class Matrix{
     * @param {matrix} m 
     * @returns 
     */
-    static vecMatMult(v, m) {
+     static vecMatMult(v, m) {
 
-        var newX = v.x*m[0*4 + 0] + v.y*m[1*4 + 0] + v.z*m[2*4 + 0] + v.w*m[3*4 + 0];
-        var newY = v.x*m[0*4 + 1] + v.y*m[1*4 + 1] + v.z*m[2*4 + 1] + v.w*m[3*4 + 1];
-        var newZ = v.x*m[0*4 + 2] + v.y*m[1*4 + 2] + v.z*m[2*4 + 2] + v.w*m[3*4 + 2];
-        var newW = v.x*m[0*4 + 3] + v.y*m[1*4 + 3] + v.z*m[2*4 + 3] + v.w*m[3*4 + 3];
-        return new Vector4( newX, newY, newZ, newW );
+      var newX = v.x*m[0*4 + 0] + v.y*m[1*4 + 0] + v.z*m[2*4 + 0] + v.w*m[3*4 + 0];
+      var newY = v.x*m[0*4 + 1] + v.y*m[1*4 + 1] + v.z*m[2*4 + 1] + v.w*m[3*4 + 1];
+      var newZ = v.x*m[0*4 + 2] + v.y*m[1*4 + 2] + v.z*m[2*4 + 2] + v.w*m[3*4 + 2];
+      var newW = v.x*m[0*4 + 3] + v.y*m[1*4 + 3] + v.z*m[2*4 + 3] + v.w*m[3*4 + 3];
+      return new Vector4( newX, newY, newZ, newW );
+        
+    }
+    
+    /**
+    * 
+    * @param {Quat} q 
+    * @param {matrix} m 
+    * @returns 
+    */
+    static quatMatMult(q, m) {
+
+      var newX = q.x*m[0*4 + 0] + q.y*m[1*4 + 0] + q.z*m[2*4 + 0] + q.w*m[3*4 + 0];
+      var newY = q.x*m[0*4 + 1] + q.y*m[1*4 + 1] + q.z*m[2*4 + 1] + q.w*m[3*4 + 1];
+      var newZ = q.x*m[0*4 + 2] + q.y*m[1*4 + 2] + q.z*m[2*4 + 2] + q.w*m[3*4 + 2];
+      var newW = q.x*m[0*4 + 3] + q.y*m[1*4 + 3] + q.z*m[2*4 + 3] + q.w*m[3*4 + 3];
+      return new Quat( newX, newY, newZ, newW );
+        
+    }
+
+    /**
+    * 
+    * @param {Vector4[]} varr 
+    * @param {matrix} m 
+    * @returns 
+    */
+    static vecArrMatMult(varr, m) {
+      
+      var retArr = [];
+      for ( var i = 0; i < varr.length; i++ ){
+            retArr.push( Matrix.vecMatMult( varr[i], m ) )
+      }
+      return retArr;
         
     }
 }
