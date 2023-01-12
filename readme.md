@@ -72,9 +72,11 @@ Then to pick up or to drop an axe back to its position it was just in, walk up c
 
 ![pickupdownTable](/AxeThrower/Screenshots/pickupdownTable.gif)
 
+![pickupdownWall](/AxeThrower/Screenshots/pickupdownWall.gif)
+
 The most exciting part. To throw an axe, while holding one, press space ( either hold it to prepare to throw it or quick press it to throw without intentional aiming ). Of course, this can be combined with the WASD and click and drag controls so that you can aim the axe anywhere in the scene you'd like it to go:
 
-![pickupdownWall](/AxeThrower/Screenshots/pickupdownWall.gif)
+![throwAxe](/AxeThrower/Screenshots/throwAxe.gif)]
 
 One bonus feature that was added was the ability to interact with the die on the table. To do this, walk up to the die on the table and press e near it while no axes are nearby. This is necessary because the axe interaction takes precedence:
 
